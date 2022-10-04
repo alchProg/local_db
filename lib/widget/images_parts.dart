@@ -32,16 +32,6 @@ class _ImagesPartsState extends State<ImagesParts> {
     priceLists = await LocalDatabase.instance.readAllPriceLists();
   }
 
-  Color _switchColor (PriceList priceList) {
-    Color color1 = Colors.brown.shade700;
-    Color color2 = Colors.white.withOpacity(0.4);
-
-    if(priceLists.contains(priceList)){
-      return color1;
-    }
-    return color2;
-  }
-
   @override
   Widget build(BuildContext context) {
 

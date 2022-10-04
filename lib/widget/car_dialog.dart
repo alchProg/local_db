@@ -48,7 +48,7 @@ class CarDialog {
           errorStyle: const TextStyle(
             color: Colors.red,
           ),
-          labelText: "${labelTextName}*",
+          labelText: "$labelTextName*",
           labelStyle: const TextStyle(color: Colors.white38),
           border: InputBorder.none,
         ),

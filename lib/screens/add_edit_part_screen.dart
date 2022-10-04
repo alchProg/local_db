@@ -127,8 +127,8 @@ class _AddEditPartScreenState extends State<AddEditPartScreen> {
           borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
         ),
         child: ListTile(
-          title: Text(title, style: TextStyle(fontSize: 24),),
-          subtitle: Text(widget.pName, style: TextStyle(fontSize: 14),),
+          title: Text(title, style: const TextStyle(fontSize: 24),),
+          subtitle: Text(widget.pName, style: const TextStyle(fontSize: 14),),
         ),
       ),
     );

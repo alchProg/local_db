@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 import '../models/part_model.dart';
 
 class PartCardWidget extends StatefulWidget {
-  PartCardWidget({
+  const PartCardWidget({
     Key? key,
     required this.part,
     required this.index,

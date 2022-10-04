@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
         //scaffoldBackgroundColor: Colors.blueGrey,
         //primarySwatch: Color(),
       ),
-      home: ProfilesScreen(),
+      home: const ProfilesScreen(),
     );
   }
 }

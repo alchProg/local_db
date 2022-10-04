@@ -45,7 +45,7 @@ class CarFormWidget extends StatelessWidget {
       child: TextFormField(
         onChanged: onChangedTitle,
         validator: (title) {
-          if(title == null || title!.isEmpty){
+          if(title == null || title.isEmpty){
             return 'Поле не может быть пустым!';
           } else { return null;}
         },

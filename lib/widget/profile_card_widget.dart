@@ -3,7 +3,7 @@ import 'package:local_db/db/local_database.dart';
 import '../models/profile_model.dart';
 
 class ProfileCardWidget extends StatefulWidget {
-  ProfileCardWidget({
+  const ProfileCardWidget({
     Key? key,
     required this.onProfileSelect,
     required this.onProfileSettings,
@@ -12,7 +12,7 @@ class ProfileCardWidget extends StatefulWidget {
     required this.index,
   }) : super(key: key);
 
-  Profile profile;
+  final Profile profile;
   final int index;
   final VoidCallback onProfileSelect;
   final VoidCallback onProfileSettings;
@@ -67,7 +67,7 @@ class _ProfileCardWidgetState extends State<ProfileCardWidget> {
     return Column(
       children: [
         Card(
-          margin: EdgeInsets.only(top: 5),
+          margin: const EdgeInsets.only(top: 5),
             color: color,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -163,7 +163,7 @@ class _ProfileCardWidgetState extends State<ProfileCardWidget> {
                         ),
                 ),
                 Padding(
-                  padding: EdgeInsets.all(2),
+                  padding: const EdgeInsets.all(2),
                   child: AnimatedContainer(
                     decoration: BoxDecoration(
                       borderRadius: const BorderRadius.vertical(bottom: Radius.circular(4),),

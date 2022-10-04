@@ -5,12 +5,10 @@ import 'package:focused_menu/modals.dart';
 import 'package:local_db/db/local_database.dart';
 import 'package:local_db/models/car_model.dart';
 import 'package:local_db/models/part_model.dart';
-import 'package:local_db/models/price_list_screen.dart';
+import 'package:local_db/screens/price_list_screen.dart';
 import 'package:local_db/screens/profile_settings_screen.dart';
 import 'package:local_db/widget/fmi_widget.dart';
 import 'package:local_db/widget/images_parts.dart';
-
-
 
 class SetScreen extends StatefulWidget {
   final int pID;
@@ -38,7 +36,6 @@ class _SetScreenState extends State<SetScreen> {
 
   @override
   void initState() {
-    if(selectedPartsList.isEmpty){print("list is empty!");} else {selectedPartsList.forEach((element) {print(element.title);});}
     selectedPartsList.clear();
     partsAndCarsInit();
     super.initState();

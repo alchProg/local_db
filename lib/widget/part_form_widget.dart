@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:validators/validators.dart';
 
 class PartFormWidget extends StatefulWidget {
 
-  late  String? price;
+  final  String? price;
   final String? desc;
   final String? labelText;
   final bool? autofocus;
@@ -12,7 +11,7 @@ class PartFormWidget extends StatefulWidget {
   final ValueChanged<String>? onChangedDesc;
   final BorderRadius? borderRadius;
 
-  PartFormWidget({
+  const PartFormWidget({
     Key? key,
     this.autofocus,
     this.price,
@@ -50,10 +49,9 @@ class _PartFormWidgetState extends State<PartFormWidget> {
           extentOffset: textController.text.length);
   }
 
-
   @override
   Widget build(BuildContext context) {
-
+  
     return Row(
       children: [
         Padding(

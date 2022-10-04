@@ -3,43 +3,38 @@ import 'package:flutter_svg/svg.dart';
 import 'package:local_db/db/local_database.dart';
 import 'package:local_db/models/normal_parts_lib.dart';
 import 'package:local_db/models/part_model.dart';
-import 'package:local_db/models/price_list_items_model.dart';
-import 'package:local_db/models/price_list_model.dart';
-
-import '../generated/assets.dart';
 
 class ScreenPartWidget extends StatefulWidget {
+  final NormalPart nPart;
+  final int pID;
+  final String carType;
+  final String assetName;
+  final Color? color;
+  final double? xScale;
+  final double? width;
+  final double? height;
+  final List<double?>? left;
+  final List<double?>? right;
+  final List<double?>? top;
+  final List<double?>? bottom;
+  final VoidCallback? onTap;
+  final bool isSide;
 
-  NormalPart nPart;
-  int pID;
-  String carType;
-  String assetName;
-  Color? color;
-  double? xScale;
-  double? width;
-  double? height;
-  List<double?>? left;
-  List<double?>? right ;
-  List<double?>? top   ;
-  List<double?>? bottom;
-  VoidCallback? onTap;
-  bool isSide;
-
-  ScreenPartWidget({
+  const ScreenPartWidget({
     Key? key,
     required this.nPart,
     required this.pID,
     required this.carType,
     required this.assetName,
     this.color,
-    this.xScale ,
-    this.width  ,
-    this.height ,
-    this.left   ,
-    this.right  ,
-    this.top    ,
-    this.bottom ,
-    this.onTap  ,
+    this.xScale,
+    this.width,
+    this.height,
+    this.left,
+    this.right,
+    this.top,
+    this.bottom,
+    this.onTap,
     required this.isSide,
   }) : super(key: key);
 
@@ -48,8 +43,6 @@ class ScreenPartWidget extends StatefulWidget {
 }
 
 class _ScreenPartWidgetState extends State<ScreenPartWidget> {
-
-
   bool isLoading = false;
   late Part part;
 
@@ -57,10 +50,8 @@ class _ScreenPartWidgetState extends State<ScreenPartWidget> {
   late double width;
   late double height;
 
-
   @override
   void initState() {
-
     sizeInit();
     _priceListRefresh();
     super.initState();
@@ -68,16 +59,17 @@ class _ScreenPartWidgetState extends State<ScreenPartWidget> {
 
   Future _priceListRefresh() async {
     setState(() => isLoading = true);
-    part = await LocalDatabase.instance.readPTTPart(widget.nPart.title, widget.pID, widget.carType);
+    part = await LocalDatabase.instance
+        .readPTTPart(widget.nPart.title, widget.pID, widget.carType);
     Future.delayed(const Duration(milliseconds: 10), () {
       setState(() => isLoading = false);
     });
   }
 
-  sizeInit(){
+  sizeInit() {
     xScale = widget.xScale ?? 1;
 
-    if(widget.isSide){
+    if (widget.isSide) {
       width = widget.nPart.sWidth ?? 0;
       height = widget.nPart.sHeight ?? 0;
     } else {
@@ -86,70 +78,76 @@ class _ScreenPartWidgetState extends State<ScreenPartWidget> {
     }
   }
 
-  double? _offset (List<double?>? sizes) {
-    if(sizes == null){return null;}
+  double? _offset(List<double?>? sizes) {
+    if (sizes == null) {
+      return null;
+    }
     double result = 5.0;
-    if(sizes.isEmpty){return result;}
+    if (sizes.isEmpty) {
+      return result;
+    }
     double oSet = 3.0;
-    sizes.forEach((size) {
+    for (double? size in sizes) {
       result += oSet + (size ?? 0);
-    });
+    }
     return result * xScale;
   }
 
   @override
   Widget build(BuildContext context) {
     return Positioned(
-        width:  width  * xScale,
-        height: height * xScale,
-        left:  _offset(widget.left   ),
-        right: _offset(widget.right  ),
-        top:   _offset(widget.top    ),
-        bottom:_offset(widget.bottom ),
-        child: isLoading
-            ? const Center(child: CircularProgressIndicator(),)
-            : InkWell(
-                highlightColor: Colors.transparent,
-                splashFactory: NoSplash.splashFactory,
-                onTap: (){
-                  _addOrDeleteItem();
-                  },
-                child:SvgPicture.asset(
-                  widget.assetName,
-                  color: color,
-                ),
+      width: width * xScale,
+      height: height * xScale,
+      left: _offset(widget.left),
+      right: _offset(widget.right),
+      top: _offset(widget.top),
+      bottom: _offset(widget.bottom),
+      child: isLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : InkWell(
+              highlightColor: Colors.transparent,
+              splashFactory: NoSplash.splashFactory,
+              onTap: () {
+                _addOrDeleteItem();
+              },
+              child: SvgPicture.asset(
+                widget.assetName,
+                color: color,
               ),
+            ),
     );
   }
+
   Color color = Colors.white.withOpacity(0.4);
 
-  void _addOrDeleteItem(){
-    final isContain = selectedPartsList.contains(part);
+  void _addOrDeleteItem() {
+    final isContain = selectedPartsList.containsKey(part.title);
+
     if (isContain) {
       setState(() {
-        selectedPartsList.remove(part);
-        color = Colors.white.withOpacity(0.4);
+        selectedPartsList.remove(part.title);
       });
-      print("Part ${part.title} removed");
-    }
-    else {
+    } else {
       setState(() {
-        selectedPartsList.add(part);
-        color = Colors.brown.shade700;
+        selectedPartsList[part.title] = part;
       });
-      print("Part ${part.title} added");
     }
+    _setColor();
+    debugPrint('selectedPartsList: ${selectedPartsList.keys}');
   }
 
-  // Color _setColor(){
-  //   final Color color1 = Colors.brown.shade700;
-  //   final Color color2 = Colors.white.withOpacity(0.4);
-  //   final isContain = selectedPartsList.contains(part);
-  //
-  //   setState(() {
-  //     if (isContain) {return color1;}
-  //     else {return color2;}
-  //   });
-  // }
-
+  void _setColor() {
+    final isContain = selectedPartsList.containsKey(part.title);
+    if (isContain) {
+      setState(() {
+        color = Colors.brown.shade700;
+      });
+    } else {
+      setState(() {
+        color = Colors.white.withOpacity(0.4);
+      });
+    }
+  }
 }

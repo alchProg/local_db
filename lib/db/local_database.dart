@@ -1,4 +1,5 @@
 import 'package:local_db/models/normal_parts_lib.dart';
+// ignore: depend_on_referenced_packages
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
