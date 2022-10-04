@@ -1,7 +1,9 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
+import 'package:local_db/blocs/color_bloc.dart';
 import 'package:local_db/db/local_database.dart';
 import 'package:local_db/models/car_model.dart';
 import 'package:local_db/models/part_model.dart';
@@ -72,46 +74,49 @@ class _SetScreenState extends State<SetScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _appBar(),
-      body: SingleChildScrollView (
-        child: Column (
-          children: [
-            isLoading
-                ? const Center(child: CircularProgressIndicator(),)
-                : cars.isEmpty
-                      ? Column(
-                          children: [
-                            const Padding(padding: EdgeInsets.only(left: 10, top: 30,right: 10),
-                              child: Icon(Icons.warning_amber_rounded, size: 100, color: Colors.red,),
-                            ),
-                            Padding(padding: const EdgeInsets.all(10),
-                              child: Text(errMsg,textAlign: TextAlign.center,),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
-                                Icon(Icons.car_repair),
-                                Text("=> 'Добавить'", textAlign: TextAlign.center,),
-                              ],
-                            ),
-                            ElevatedButton(
-                              onPressed: () async {
-                                await Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => PartsSettingsScreen(pID: widget.pID, pName: widget.pName,)));
-                                currentCarType == '------'
-                                    ? partsAndCarsInit()
-                                    : refreshCars();
-                              },
-                              child: const Text("Настройка профиля", textAlign: TextAlign.center,),)
-                          ],
-                        )
-                      : InteractiveViewer(
-                          panEnabled: false, // Set it to false
-                          boundaryMargin: const EdgeInsets.all(10),
-                          minScale: 0.5,
-                          maxScale: 1.5,
-                          child: ImagesParts(pID: widget.pID, carType: currentCarType,),
-                        ),
-          ],
+      body: BlocProvider(
+        create: (context) => ColorBloc(),
+        child: SingleChildScrollView (
+          child: Column (
+            children: [
+              isLoading
+                  ? const Center(child: CircularProgressIndicator(),)
+                  : cars.isEmpty
+                        ? Column(
+                            children: [
+                              const Padding(padding: EdgeInsets.only(left: 10, top: 30,right: 10),
+                                child: Icon(Icons.warning_amber_rounded, size: 100, color: Colors.red,),
+                              ),
+                              Padding(padding: const EdgeInsets.all(10),
+                                child: Text(errMsg,textAlign: TextAlign.center,),
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: const [
+                                  Icon(Icons.car_repair),
+                                  Text("=> 'Добавить'", textAlign: TextAlign.center,),
+                                ],
+                              ),
+                              ElevatedButton(
+                                onPressed: () async {
+                                  await Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) => PartsSettingsScreen(pID: widget.pID, pName: widget.pName,)));
+                                  currentCarType == '------'
+                                      ? partsAndCarsInit()
+                                      : refreshCars();
+                                },
+                                child: const Text("Настройка профиля", textAlign: TextAlign.center,),)
+                            ],
+                          )
+                        : InteractiveViewer(
+                            panEnabled: false, // Set it to false
+                            boundaryMargin: const EdgeInsets.all(10),
+                            minScale: 0.5,
+                            maxScale: 1.5,
+                            child: ImagesParts(pID: widget.pID, carType: currentCarType,),
+                          ),
+            ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(

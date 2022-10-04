@@ -59,18 +59,20 @@ class _PriceListScreenState extends State<PriceListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _appBar(),
-      body: Padding(
-        padding: const EdgeInsets.all(5),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _listBuilder(),
-            Divider(
-              color: Colors.white,
-              height: 3,
-            ),
-            _totalPriceBuilder(),
-          ],
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(5),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _listBuilder(),
+              const Divider(
+                color: Colors.white,
+                height: 3,
+              ),
+              _totalPriceBuilder(),
+            ],
+          ),
         ),
       ),
     );
@@ -90,7 +92,7 @@ class _PriceListScreenState extends State<PriceListScreen> {
       height: (MediaQuery.of(context).size.height -
           MediaQuery.of(context).padding.top -
           MediaQuery.of(context).padding.top -
-          90),
+          120),
       child: SingleChildScrollView(
         child: Column(
           children: listItems,

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:local_db/blocs/color_bloc.dart';
 import 'package:local_db/db/local_database.dart';
 import 'package:local_db/models/normal_parts_lib.dart';
 import 'package:local_db/models/part_model.dart';
@@ -45,6 +47,7 @@ class ScreenPartWidget extends StatefulWidget {
 class _ScreenPartWidgetState extends State<ScreenPartWidget> {
   bool isLoading = false;
   late Part part;
+  late ColorBloc _bloc;
 
   late double xScale;
   late double width;
@@ -95,6 +98,7 @@ class _ScreenPartWidgetState extends State<ScreenPartWidget> {
 
   @override
   Widget build(BuildContext context) {
+    _bloc = BlocProvider.of<ColorBloc>(context);
     return Positioned(
       width: width * xScale,
       height: height * xScale,
@@ -106,17 +110,21 @@ class _ScreenPartWidgetState extends State<ScreenPartWidget> {
           ? const Center(
               child: CircularProgressIndicator(),
             )
-          : InkWell(
-              highlightColor: Colors.transparent,
-              splashFactory: NoSplash.splashFactory,
-              onTap: () {
-                _addOrDeleteItem();
-              },
-              child: SvgPicture.asset(
-                widget.assetName,
-                color: color,
-              ),
-            ),
+          : BlocBuilder<ColorBloc, Color> (
+            builder: (context, currentColor) {
+              return InkWell(
+                  highlightColor: Colors.transparent,
+                  splashFactory: NoSplash.splashFactory,
+                  onTap: () {
+                    _addOrDeleteItem();
+                  },
+                  child: SvgPicture.asset(
+                    widget.assetName,
+                    color: _setColor(),
+                  ),
+                );
+            }
+          ),
     );
   }
 
@@ -129,25 +137,23 @@ class _ScreenPartWidgetState extends State<ScreenPartWidget> {
       setState(() {
         selectedPartsList.remove(part.title);
       });
+      _bloc.add(SelectedColorEvent());
     } else {
       setState(() {
         selectedPartsList[part.title] = part;
       });
+      _bloc.add(UnSelectedColorEvent());
     }
-    _setColor();
+    
     debugPrint('selectedPartsList: ${selectedPartsList.keys}');
   }
 
-  void _setColor() {
+  Color _setColor() {
     final isContain = selectedPartsList.containsKey(part.title);
     if (isContain) {
-      setState(() {
-        color = Colors.brown.shade700;
-      });
+      return Colors.brown.shade700;
     } else {
-      setState(() {
-        color = Colors.white.withOpacity(0.4);
-      });
+      return Colors.white.withOpacity(0.4);
     }
   }
 }
