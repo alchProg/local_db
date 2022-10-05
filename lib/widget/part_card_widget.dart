@@ -17,7 +17,6 @@ class PartCardWidget extends StatefulWidget {
 }
 
 class _PartCardWidgetState extends State<PartCardWidget> {
-
   late List<int> prices;
   late List<IconData> icons;
 
@@ -30,38 +29,47 @@ class _PartCardWidgetState extends State<PartCardWidget> {
       widget.part.price4!,
     ];
     icons = [
-      Icons.looks_one_outlined,
-      Icons.looks_two_outlined,
-      Icons.looks_3_outlined,
-      Icons.looks_4_outlined,
+      Icons.looks_one_rounded,
+      Icons.looks_two_rounded,
+      Icons.looks_3_rounded,
+      Icons.looks_4_rounded,
     ];
     super.initState();
   }
 
-  List <Widget> _subtitleBuilder(List<int> prices) {
-    List <Widget> items = [];
+  List<Widget> _subtitleBuilder(List<int> prices) {
+    List<Widget> items = [];
     setState(() {
-      for (int price in prices){
+      for (int price in prices) {
         final item = Center(
             child: Row(
-              children: [
-                Icon(icons[prices.indexOf(price)], color: Colors.yellow.withOpacity(0.5), size: 18,),
-                const SizedBox(
-                  width: 2,
-                ),
-                Text( price != 0 ?
-                NumberFormat.currency(
-                    locale: 'Ru-ru', symbol: '₽', decimalDigits: 0)
-                    .format(price) : " - ",
-                  //textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Colors.greenAccent,
-                    fontSize: 14,
-                  ),
-                ),
+          children: [
+            Icon(
+              icons[prices.indexOf(price)],
+              color: Colors.black,
+              size: 25,
+              shadows: const [
+                Shadow(
+                    color: Colors.white, blurRadius: 10, offset: Offset(0, 0)),
               ],
-            )
-        );
+            ),
+            const SizedBox(
+              width: 2,
+            ),
+            Text(
+              price != 0
+                  ? NumberFormat.currency(
+                          locale: 'Ru-ru', symbol: '₽', decimalDigits: 0)
+                      .format(price)
+                  : " - ",
+              //textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Colors.greenAccent,
+                fontSize: 20,
+              ),
+            ),
+          ],
+        ));
         items.add(item);
       }
     });
@@ -78,42 +86,40 @@ class _PartCardWidgetState extends State<PartCardWidget> {
     ];
     return Card(
       color: Colors.black,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 5,horizontal: 10),
-              child: Text(
-                widget.part.title,
-                textAlign: TextAlign.left,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+          child: Text(
+            widget.part.title,
+            textAlign: TextAlign.left,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
             ),
-            Padding(
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(2),
+          child: Container(
+            decoration: BoxDecoration(
+                color: ThemeData.dark().dialogBackgroundColor.withOpacity(0.5),
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(4),
+                )),
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            height: 65,
+            child: GridView.count(
+              primary: false,
+              crossAxisCount: 2,
+              childAspectRatio: 6,
               padding: const EdgeInsets.all(2),
-              child: Container(
-                decoration: BoxDecoration(
-                    color: ThemeData.dark().dialogBackgroundColor.withOpacity(0.5),
-                    borderRadius: const BorderRadius.vertical(bottom: Radius.circular(4),)
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                height: 20,
-                child: GridView.count(
-                  primary: false,
-                  crossAxisCount: 4,
-                  childAspectRatio: 5,
-                  padding: const EdgeInsets.all(2),
-                  mainAxisSpacing: 10,
-                  crossAxisSpacing: 10,
-                  children: _subtitleBuilder(prices),
-                ),
-              ),
-            )
-          ]
-      ),
+              mainAxisSpacing: 1,
+              crossAxisSpacing: 10,
+              children: _subtitleBuilder(prices),
+            ),
+          ),
+        )
+      ]),
     );
   }
 }

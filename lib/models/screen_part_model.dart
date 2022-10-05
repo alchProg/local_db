@@ -130,27 +130,10 @@ class _ScreenPartWidgetState extends State<ScreenPartWidget> {
     );
   }
 
-  // Color color = Colors.white.withOpacity(0.4);
-
-  // void _addOrDeleteItem() {
-  //   final isContain = selectedPartsList.containsKey(part.title);
-  //   if (isContain) {
-  //     setState(() {
-  //       selectedPartsList.remove(part.title);
-  //     });
-  //   } else {
-  //     setState(() {
-  //       selectedPartsList[part.title] = part;
-  //     });
-  //   }
-
-  //   debugPrint('selectedPartsList: ${selectedPartsList.keys}');
-  // }
-
   Color _setColor() {
     final isContain = selectedPartsList.containsKey(part.title);
     if (isContain) {
-      return Colors.brown.shade700;
+      return Colors.blueAccent;
     } else {
       return Colors.white.withOpacity(0.4);
     }

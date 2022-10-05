@@ -126,14 +126,16 @@ class _SetScreenState extends State<SetScreen> {
                           )
                         ],
                       )
-                    : InteractiveViewer(
-                        panEnabled: false, // Set it to false
-                        boundaryMargin: const EdgeInsets.all(10),
-                        minScale: 0.5,
-                        maxScale: 1.5,
-                        child: ImagesParts(
-                          pID: widget.pID,
-                          carType: currentCarType,
+                    : Center(
+                        child: InteractiveViewer(
+                          panEnabled: false, // Set it to false
+                          boundaryMargin: const EdgeInsets.all(10),
+                          minScale: 0.5,
+                          maxScale: 1.5,
+                          child: ImagesParts(
+                            pID: widget.pID,
+                            carType: currentCarType,
+                          ),
                         ),
                       ),
           ],
@@ -204,8 +206,8 @@ class _SetScreenState extends State<SetScreen> {
         FocusedMenuHolder(
           onPressed: () {},
           menuItems: _focusedMenuItems(),
-          menuWidth: MediaQuery.of(context).size.width * 0.6,
-          menuItemExtent: MediaQuery.of(context).size.height * 0.05,
+          menuWidth: MediaQuery.of(context).size.width * 0.8,
+          menuItemExtent: MediaQuery.of(context).size.height * 0.08,
           openWithTap: true,
           menuOffset: 10.0,
           child: const Icon(Icons.car_repair_rounded),

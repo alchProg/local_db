@@ -31,9 +31,10 @@ class FocusItem {
           child: SizedBox(
             width: MediaQuery.of(context).size.width * 0.55,
             child: TextField(
-              readOnly: true,
+              enabled: false,
               maxLength: 15,
               controller: titleController,
+              textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 20,
                 color: Colors.white,
@@ -63,12 +64,13 @@ class FocusItem {
               SizedBox(
                 width: MediaQuery.of(context).size.width * 0.55,
                 child: TextField(
-                  readOnly: true,
+                  enabled: false,
                   maxLength: 15,
                   controller: titleController,
+                  textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 20,
-                    color: Colors.lightGreen,
+                    color: Colors.white,
                   ),
                   decoration: const InputDecoration(
                       counterText: '', border: InputBorder.none),

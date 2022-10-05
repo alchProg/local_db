@@ -42,10 +42,10 @@ class _PriceItemWidgetState extends State<PriceItemWidget> {
 
   void _dataInit() {
     data = [
-      [Icons.looks_one_outlined, widget.part.desc1!, widget.part.price1!],
-      [Icons.looks_two_outlined, widget.part.desc2!, widget.part.price2!],
-      [Icons.looks_3_outlined, widget.part.desc3!, widget.part.price3!],
-      [Icons.looks_4_outlined, widget.part.desc4!, widget.part.price4!],
+      [Icons.looks_one_rounded, widget.part.desc1!, widget.part.price1!],
+      [Icons.looks_two_rounded, widget.part.desc2!, widget.part.price2!],
+      [Icons.looks_3_rounded, widget.part.desc3!, widget.part.price3!],
+      [Icons.looks_4_rounded, widget.part.desc4!, widget.part.price4!],
     ];
     priceIcon = data[0][0];
     oldPrice = priceItem.price!;
@@ -108,8 +108,18 @@ class _PriceItemWidgetState extends State<PriceItemWidget> {
                   children: [
                     Icon(
                       priceIcon,
-                      size: 15,
-                      color: Colors.yellow,
+                      size: 20,
+                      color: Colors.black,
+                      shadows: const [
+                        Shadow(
+                            color: Colors.white,
+                            blurRadius: 15,
+                            offset: Offset(0, 0)),
+                        Shadow(
+                            color: Colors.white,
+                            blurRadius: 15,
+                            offset: Offset(0, 0)),
+                      ],
                     ),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -158,10 +168,10 @@ class _PriceItemWidgetState extends State<PriceItemWidget> {
       child: const Icon(
         Icons.format_paint_rounded,
         size: 30,
-        color: Colors.cyan,
+        color: Colors.black,
         shadows: [
-          Shadow(color: Colors.white, blurRadius: 50, offset: Offset(0, 3)),
-          Shadow(color: Colors.white, blurRadius: 50, offset: Offset(0, 3)),
+          Shadow(color: Colors.white, blurRadius: 5, offset: Offset(0, 0)),
+          Shadow(color: Colors.white, blurRadius: 15, offset: Offset(0, 0)),
         ],
       ),
     );
