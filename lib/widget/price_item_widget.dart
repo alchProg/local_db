@@ -12,9 +12,11 @@ class PriceItemWidget extends StatefulWidget {
   const PriceItemWidget({
     Key? key,
     required this.part,
+    this.onPriceChanged,
   }) : super(key: key);
 
   final Part part;
+  final ValueChanged<int>? onPriceChanged;
 
   @override
   State<PriceItemWidget> createState() => _PriceItemWidgetState();
@@ -58,6 +60,14 @@ class _PriceItemWidgetState extends State<PriceItemWidget> {
         title: widget.part.title,
         price: widget.part.price1,
         desc: widget.part.desc1);
+  }
+
+  void _onPriceChanged() {
+    ValueChanged<int>? onPriceChanged = widget.onPriceChanged;
+    if (onPriceChanged == null) {
+      return;
+    }
+    onPriceChanged(priceItem.price!);
   }
 
   @override
@@ -140,8 +150,8 @@ class _PriceItemWidgetState extends State<PriceItemWidget> {
     return FocusedMenuHolder(
       onPressed: () {},
       menuItems: _focusedMenuItems(),
-      menuWidth: MediaQuery.of(context).size.width * 0.6,
-      menuItemExtent: 40,
+      menuWidth: MediaQuery.of(context).size.width * 0.8,
+      menuItemExtent: MediaQuery.of(context).size.height * 0.07,
       openWithTap: true,
       animateMenuItems: false,
       menuOffset: 10.0,
@@ -170,6 +180,7 @@ class _PriceItemWidgetState extends State<PriceItemWidget> {
             setState(() => priceItem.price = dt[2]);
             setState(() {
               priceItem.price = dt[2];
+              _onPriceChanged();
               int newPrice = _parseReplace(priceOfListController.text) +
                   (-oldPrice + priceItem.price!);
               priceOfListController.text = NumberFormat.currency(
@@ -181,6 +192,7 @@ class _PriceItemWidgetState extends State<PriceItemWidget> {
           },
           context: context,
         ).itemT0());
+        _onPriceChanged();
       }
     }
     return focusedMenuItemList;

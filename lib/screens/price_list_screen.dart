@@ -35,7 +35,7 @@ class _PriceListScreenState extends State<PriceListScreen> {
 
   @override
   void dispose() {
-    priceOfListController.text = '0';
+    priceOfListController.text = '0 ₽';
     super.dispose();
   }
 
@@ -78,12 +78,33 @@ class _PriceListScreenState extends State<PriceListScreen> {
     );
   }
 
+  int _parseReplace(String inputStr) {
+    RegExp regEx = RegExp(r'[^0-9]');
+    return int.parse(inputStr.replaceAll(regEx, ''));
+  }
+
   Widget _listBuilder() {
     List<Widget> listItems = [];
     for (Part part in selectedPartsList.values) {
-      listItems.add(PriceItemWidget(
-        part: part,
-      ));
+      int currentPrice = 0;
+      listItems.add(Dismissible(
+          key: Key(part.title),
+          onDismissed: (direction) {
+            setState(() {
+              selectedPartsList.remove(part.title);
+              int newPrice =
+                  _parseReplace(priceOfListController.text) - currentPrice;
+              priceOfListController.text = NumberFormat.currency(
+                      locale: 'Ru-ru', symbol: '₽', decimalDigits: 0)
+                  .format(newPrice);
+            });
+          },
+          child: PriceItemWidget(
+            part: part,
+            onPriceChanged: (newPrice) {
+              currentPrice = newPrice;
+            },
+          )));
     }
     return Container(
       decoration: const BoxDecoration(
@@ -118,7 +139,7 @@ class _PriceListScreenState extends State<PriceListScreen> {
                   fontSize: 24,
                   fontWeight: FontWeight.bold),
             ),
-            Container(
+            SizedBox(
               width: MediaQuery.of(context).size.width * 0.5,
               child: TextField(
                 readOnly: true,
@@ -182,9 +203,10 @@ class _PriceListScreenState extends State<PriceListScreen> {
     return FocusedMenuHolder(
       onPressed: () {},
       menuItems: _focusedMenuItems(),
-      menuWidth: MediaQuery.of(context).size.width * 0.6,
-      menuItemExtent: 40,
+      menuWidth: MediaQuery.of(context).size.width * 0.8,
+      menuItemExtent: MediaQuery.of(context).size.height * 0.07,
       openWithTap: true,
+      animateMenuItems: false,
       menuOffset: 10.0,
       child: const Icon(Icons.menu_rounded),
     );

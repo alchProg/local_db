@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:local_db/blocs/color_bloc.dart';
 import 'package:local_db/db/local_database.dart';
 import 'package:local_db/models/normal_parts_lib.dart';
 import 'package:local_db/models/part_model.dart';
@@ -20,6 +18,7 @@ class ScreenPartWidget extends StatefulWidget {
   final List<double?>? top;
   final List<double?>? bottom;
   final VoidCallback? onTap;
+  final ValueSetter<Part>? getPart;
   final bool isSide;
 
   const ScreenPartWidget({
@@ -38,6 +37,7 @@ class ScreenPartWidget extends StatefulWidget {
     this.bottom,
     this.onTap,
     required this.isSide,
+    this.getPart,
   }) : super(key: key);
 
   @override
@@ -47,7 +47,6 @@ class ScreenPartWidget extends StatefulWidget {
 class _ScreenPartWidgetState extends State<ScreenPartWidget> {
   bool isLoading = false;
   late Part part;
-  late ColorBloc _bloc;
 
   late double xScale;
   late double width;
@@ -55,12 +54,12 @@ class _ScreenPartWidgetState extends State<ScreenPartWidget> {
 
   @override
   void initState() {
-    sizeInit();
+    _sizeInit();
     _priceListRefresh();
     super.initState();
   }
 
-  Future _priceListRefresh() async {
+  Future<void> _priceListRefresh() async {
     setState(() => isLoading = true);
     part = await LocalDatabase.instance
         .readPTTPart(widget.nPart.title, widget.pID, widget.carType);
@@ -69,7 +68,7 @@ class _ScreenPartWidgetState extends State<ScreenPartWidget> {
     });
   }
 
-  sizeInit() {
+  void _sizeInit() {
     xScale = widget.xScale ?? 1;
 
     if (widget.isSide) {
@@ -96,9 +95,18 @@ class _ScreenPartWidgetState extends State<ScreenPartWidget> {
     return result * xScale;
   }
 
+  void _onTaped() {
+    final ValueSetter<Part>? getPart = widget.getPart;
+    if (getPart == null) {
+      return;
+    }
+    getPart(part);
+    debugPrint('selectedPartsList: ${selectedPartsList.keys}');
+    // widget.onTap?.call();
+  }
+
   @override
   Widget build(BuildContext context) {
-    _bloc = BlocProvider.of<ColorBloc>(context);
     return Positioned(
       width: width * xScale,
       height: height * xScale,
@@ -110,43 +118,34 @@ class _ScreenPartWidgetState extends State<ScreenPartWidget> {
           ? const Center(
               child: CircularProgressIndicator(),
             )
-          : BlocBuilder<ColorBloc, Color> (
-            builder: (context, currentColor) {
-              return InkWell(
-                  highlightColor: Colors.transparent,
-                  splashFactory: NoSplash.splashFactory,
-                  onTap: () {
-                    _addOrDeleteItem();
-                  },
-                  child: SvgPicture.asset(
-                    widget.assetName,
-                    color: _setColor(),
-                  ),
-                );
-            }
-          ),
+          : InkWell(
+              highlightColor: Colors.transparent,
+              splashFactory: NoSplash.splashFactory,
+              onTap: _onTaped,
+              child: SvgPicture.asset(
+                widget.assetName,
+                color: _setColor(),
+              ),
+            ),
     );
   }
 
-  Color color = Colors.white.withOpacity(0.4);
+  // Color color = Colors.white.withOpacity(0.4);
 
-  void _addOrDeleteItem() {
-    final isContain = selectedPartsList.containsKey(part.title);
+  // void _addOrDeleteItem() {
+  //   final isContain = selectedPartsList.containsKey(part.title);
+  //   if (isContain) {
+  //     setState(() {
+  //       selectedPartsList.remove(part.title);
+  //     });
+  //   } else {
+  //     setState(() {
+  //       selectedPartsList[part.title] = part;
+  //     });
+  //   }
 
-    if (isContain) {
-      setState(() {
-        selectedPartsList.remove(part.title);
-      });
-      _bloc.add(SelectedColorEvent());
-    } else {
-      setState(() {
-        selectedPartsList[part.title] = part;
-      });
-      _bloc.add(UnSelectedColorEvent());
-    }
-    
-    debugPrint('selectedPartsList: ${selectedPartsList.keys}');
-  }
+  //   debugPrint('selectedPartsList: ${selectedPartsList.keys}');
+  // }
 
   Color _setColor() {
     final isContain = selectedPartsList.containsKey(part.title);

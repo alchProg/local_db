@@ -157,8 +157,8 @@ class _PartsSettingsScreenState extends State<PartsSettingsScreen> {
         FocusedMenuHolder(
           onPressed: (){},
           menuItems: _focusedMenuItems(),
-          menuWidth: MediaQuery.of(context).size.width*0.6,
-          menuItemExtent: 40,
+          menuWidth: MediaQuery.of(context).size.width*0.8,
+          menuItemExtent: MediaQuery.of(context).size.height * 0.07,
           openWithTap: true,
           menuOffset: 10.0,
           child: const Icon(Icons.car_repair_rounded),
