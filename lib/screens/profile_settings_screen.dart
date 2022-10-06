@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
 import 'package:local_db/db/local_database.dart';
-import 'package:local_db/widget/page_indicator_painter.dart';
+import 'package:local_db/models/page_indicator_model.dart';
 import '../models/car_model.dart';
 import '../models/part_model.dart';
 import '../widget/fmi_widget.dart';

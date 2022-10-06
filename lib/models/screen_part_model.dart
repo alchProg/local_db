@@ -17,7 +17,6 @@ class ScreenPartWidget extends StatefulWidget {
   final List<double?>? right;
   final List<double?>? top;
   final List<double?>? bottom;
-  final VoidCallback? onTap;
   final ValueSetter<Part>? getPart;
   final bool isSide;
 
@@ -35,7 +34,6 @@ class ScreenPartWidget extends StatefulWidget {
     this.right,
     this.top,
     this.bottom,
-    this.onTap,
     required this.isSide,
     this.getPart,
   }) : super(key: key);
@@ -101,8 +99,6 @@ class _ScreenPartWidgetState extends State<ScreenPartWidget> {
       return;
     }
     getPart(part);
-    debugPrint('selectedPartsList: ${selectedPartsList.keys}');
-    // widget.onTap?.call();
   }
 
   @override

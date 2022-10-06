@@ -6,33 +6,56 @@ import 'package:local_db/models/price_list_items_model.dart';
 import 'package:local_db/models/price_list_model.dart';
 import 'package:local_db/widget/fmi_widget.dart';
 import '../models/part_model.dart';
-import '../screens/price_list_screen.dart';
 
 class PriceItemWidget extends StatefulWidget {
   const PriceItemWidget({
     Key? key,
     required this.part,
+    this.onIndexChanged,
     this.onPriceChanged,
+    required this.dataIndex,
   }) : super(key: key);
 
   final Part part;
+  final ValueChanged<int>? onIndexChanged;
   final ValueChanged<int>? onPriceChanged;
+  final int dataIndex;
 
   @override
   State<PriceItemWidget> createState() => _PriceItemWidgetState();
 }
 
 class _PriceItemWidgetState extends State<PriceItemWidget> {
-  late List<dynamic> data;
-  late PriceListItem priceItem;
-  late IconData priceIcon;
-  int oldPrice = 0;
+  late List<dynamic> _currentData;
+  late PriceListItem _priceItem;
+  late IconData _priceIcon;
+  late int _priceIndex;
+  int _oldItemPrice = 0;
 
   @override
   void initState() {
-    _priceItemInit();
     _dataInit();
+    _listPriceUpdate();
+    standartPriceItemsList[_priceItem.title] = _priceItem;
     super.initState();
+  }
+
+  void _dataInit() {
+    _priceIndex = widget.dataIndex;
+
+    _currentData = [
+      [Icons.looks_one_rounded, widget.part.desc1!, widget.part.price1!],
+      [Icons.looks_two_rounded, widget.part.desc2!, widget.part.price2!],
+      [Icons.looks_3_rounded, widget.part.desc3!, widget.part.price3!],
+      [Icons.looks_4_rounded, widget.part.desc4!, widget.part.price4!],
+    ];
+
+    _priceIcon = _currentData[_priceIndex][0];
+    _priceItem = PriceListItem(
+      title: widget.part.title,
+      desc: _currentData[_priceIndex][1],
+      price: _currentData[_priceIndex][2],
+    );
   }
 
   int _parseReplace(String inputStr) {
@@ -40,26 +63,13 @@ class _PriceItemWidgetState extends State<PriceItemWidget> {
     return int.parse(inputStr.replaceAll(regEx, ''));
   }
 
-  void _dataInit() {
-    data = [
-      [Icons.looks_one_rounded, widget.part.desc1!, widget.part.price1!],
-      [Icons.looks_two_rounded, widget.part.desc2!, widget.part.price2!],
-      [Icons.looks_3_rounded, widget.part.desc3!, widget.part.price3!],
-      [Icons.looks_4_rounded, widget.part.desc4!, widget.part.price4!],
-    ];
-    priceIcon = data[0][0];
-    oldPrice = priceItem.price!;
-    int totalPrice = _parseReplace(priceOfListController.text) + oldPrice;
-    priceOfListController.text =
-        NumberFormat.currency(locale: 'Ru-ru', symbol: '₽', decimalDigits: 0)
-            .format(totalPrice);
-  }
-
-  void _priceItemInit() {
-    priceItem = PriceListItem(
-        title: widget.part.title,
-        price: widget.part.price1,
-        desc: widget.part.desc1);
+  void _listPriceUpdate() {
+    _oldItemPrice = _priceItem.price!;
+    int currentListPrice =
+        _parseReplace(priceOfListController.text) + _oldItemPrice;
+    // priceOfListController.text =
+    //     NumberFormat.currency(locale: 'Ru-ru', symbol: '₽', decimalDigits: 0)
+    //         .format(currentListPrice);
   }
 
   void _onPriceChanged() {
@@ -67,7 +77,15 @@ class _PriceItemWidgetState extends State<PriceItemWidget> {
     if (onPriceChanged == null) {
       return;
     }
-    onPriceChanged(priceItem.price!);
+    onPriceChanged(_priceItem.price!);
+  }
+
+  void _onIndexChanged() {
+    ValueChanged<int>? onIndexChanged = widget.onIndexChanged;
+    if (onIndexChanged == null) {
+      return;
+    }
+    onIndexChanged(_priceIndex);
   }
 
   @override
@@ -79,7 +97,7 @@ class _PriceItemWidgetState extends State<PriceItemWidget> {
           padding: EdgeInsets.zero,
           child: ListTile(
             title: Text(
-              priceItem.title,
+              _priceItem.title,
               textAlign: TextAlign.left,
               style: const TextStyle(
                 fontSize: 20,
@@ -107,7 +125,7 @@ class _PriceItemWidgetState extends State<PriceItemWidget> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Icon(
-                      priceIcon,
+                      _priceIcon,
                       size: 20,
                       color: Colors.black,
                       shadows: const [
@@ -132,7 +150,7 @@ class _PriceItemWidgetState extends State<PriceItemWidget> {
                     Text(
                       NumberFormat.currency(
                               locale: 'Ru-ru', symbol: '₽', decimalDigits: 0)
-                          .format(priceItem.price),
+                          .format(_priceItem.price),
                       textAlign: TextAlign.left,
                       style: const TextStyle(
                         color: Colors.greenAccent,
@@ -142,7 +160,7 @@ class _PriceItemWidgetState extends State<PriceItemWidget> {
                   ],
                 ),
                 Text(
-                  priceItem.desc!,
+                  _priceItem.desc!,
                   textAlign: TextAlign.left,
                   style: const TextStyle(
                     fontSize: 14,
@@ -179,30 +197,32 @@ class _PriceItemWidgetState extends State<PriceItemWidget> {
 
   _focusedMenuItems() {
     List<FocusedMenuItem> focusedMenuItemList = <FocusedMenuItem>[];
-    for (var dt in data) {
-      if (dt[2] != 0) {
+    List<dynamic> cdt = _currentData;
+    for (int i = 0; i < _currentData.length; i++) {
+      if (cdt[i][2] != 0) {
         focusedMenuItemList.add(FocusItem(
           backgroundColor: ThemeData.dark().dialogBackgroundColor,
-          title: dt[1],
+          title: cdt[i][1],
           onPressed: () {
-            setState(() => priceIcon = dt[0]);
-            setState(() => priceItem.desc = dt[1]);
-            setState(() => priceItem.price = dt[2]);
             setState(() {
-              priceItem.price = dt[2];
-              _onPriceChanged();
+              _priceIcon = cdt[i][0];
+              _priceItem.desc = cdt[i][1];
+              _priceItem.price = cdt[i][2];
+
               int newPrice = _parseReplace(priceOfListController.text) +
-                  (-oldPrice + priceItem.price!);
+                  (-_oldItemPrice + _priceItem.price!);
               priceOfListController.text = NumberFormat.currency(
                       locale: 'Ru-ru', symbol: '₽', decimalDigits: 0)
                   .format(newPrice);
-              oldPrice = priceItem.price!;
-              const PriceListScreen().createState().reassemble();
+              _oldItemPrice = _priceItem.price!;
+              _priceIndex = i;
+              _onIndexChanged();
+              _onPriceChanged();
+              // const PriceListScreen().createState().reassemble();
             });
           },
           context: context,
         ).itemT0());
-        _onPriceChanged();
       }
     }
     return focusedMenuItemList;

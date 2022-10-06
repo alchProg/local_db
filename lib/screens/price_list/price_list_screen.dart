@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
 import 'package:intl/intl.dart';
-import 'package:local_db/models/part_model.dart';
+import 'package:local_db/models/price_list_items_model.dart';
 import 'package:local_db/models/price_list_model.dart';
+import 'package:local_db/screens/price_list/components/standart_items.dart';
+import 'package:local_db/screens/price_list/components/user_items.dart';
 import 'package:local_db/widget/fmi_widget.dart';
-import 'package:local_db/widget/price_item_widget.dart';
 
 class PriceListScreen extends StatefulWidget {
   const PriceListScreen({
@@ -19,6 +20,7 @@ class PriceListScreen extends StatefulWidget {
 class _PriceListScreenState extends State<PriceListScreen> {
   TextEditingController titleOfListController = TextEditingController();
   late PriceList priceList;
+  late PageController _pageController;
   bool isLoading = true;
   String carType = '';
 
@@ -41,6 +43,7 @@ class _PriceListScreenState extends State<PriceListScreen> {
 
   void _priceListInit() {
     titleOfListController.text = "Unnamed Price List";
+    _pageController = PageController(initialPage: 0);
     priceList = PriceList(
         carType: carType,
         title: titleOfListController.text,
@@ -55,6 +58,7 @@ class _PriceListScreenState extends State<PriceListScreen> {
     });
   }
 
+  late int currentPrice;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,7 +69,38 @@ class _PriceListScreenState extends State<PriceListScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _listBuilder(),
+              Expanded(
+                child: PageView.builder(
+                    controller: _pageController,
+                    itemCount: 2,
+                    itemBuilder: (context, index) {
+                      if (index == 0) {
+                        return StandartItems(
+                          onDissmissed: () {
+                            setState(() {
+                              int newPrice =
+                                  _parseReplace(priceOfListController.text) -
+                                      currentPrice;
+                              priceOfListController.text = NumberFormat.currency(
+                                      locale: 'Ru-ru',
+                                      symbol: '₽',
+                                      decimalDigits: 0)
+                                  .format(newPrice);
+                            });
+                          },
+                          onPriceChanged: (newPrice) {
+                            currentPrice = newPrice;
+                          },
+                        );
+                      } else {
+                        return UserItems(
+                          onDissmissed: () {
+                            
+                          },
+                        );
+                      }
+                    }),
+              ),
               const Divider(
                 color: Colors.white,
                 height: 3,
@@ -81,45 +116,6 @@ class _PriceListScreenState extends State<PriceListScreen> {
   int _parseReplace(String inputStr) {
     RegExp regEx = RegExp(r'[^0-9]');
     return int.parse(inputStr.replaceAll(regEx, ''));
-  }
-
-  Widget _listBuilder() {
-    List<Widget> listItems = [];
-    for (Part part in selectedPartsList.values) {
-      int currentPrice = 0;
-      listItems.add(Dismissible(
-          key: Key(part.title),
-          onDismissed: (direction) {
-            setState(() {
-              selectedPartsList.remove(part.title);
-              int newPrice =
-                  _parseReplace(priceOfListController.text) - currentPrice;
-              priceOfListController.text = NumberFormat.currency(
-                      locale: 'Ru-ru', symbol: '₽', decimalDigits: 0)
-                  .format(newPrice);
-            });
-          },
-          child: PriceItemWidget(
-            part: part,
-            onPriceChanged: (newPrice) {
-              currentPrice = newPrice;
-            },
-          )));
-    }
-    return Container(
-      decoration: const BoxDecoration(
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
-      ),
-      height: (MediaQuery.of(context).size.height -
-          MediaQuery.of(context).padding.top -
-          MediaQuery.of(context).padding.top -
-          120),
-      child: SingleChildScrollView(
-        child: Column(
-          children: listItems,
-        ),
-      ),
-    );
   }
 
   Widget _totalPriceBuilder() {

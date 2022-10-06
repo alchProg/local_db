@@ -4,7 +4,8 @@ import 'package:focused_menu/modals.dart';
 import 'package:local_db/db/local_database.dart';
 import 'package:local_db/models/car_model.dart';
 import 'package:local_db/models/part_model.dart';
-import 'package:local_db/screens/price_list_screen.dart';
+import 'package:local_db/models/price_list_items_model.dart';
+import 'package:local_db/screens/price_list/price_list_screen.dart';
 import 'package:local_db/screens/profile_settings_screen.dart';
 import 'package:local_db/widget/fmi_widget.dart';
 import 'package:local_db/widget/images_parts.dart';
@@ -31,9 +32,15 @@ class _SetScreenState extends State<SetScreen> {
 
   @override
   void initState() {
-    selectedPartsList.clear();
     partsAndCarsInit();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    selectedPartsList.clear();
+    userPriceItemsList.clear();
+    super.dispose();
   }
 
   Future partsAndCarsInit() async {

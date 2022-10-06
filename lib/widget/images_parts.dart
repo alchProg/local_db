@@ -18,16 +18,10 @@ class ImagesParts extends StatefulWidget {
 }
 
 class _ImagesPartsState extends State<ImagesParts> {
-  late List<PriceList> priceLists;
 
   @override
   void initState() {
-    _priceListRefresh();
     super.initState();
-  }
-
-  _priceListRefresh() async {
-    priceLists = await LocalDatabase.instance.readAllPriceLists();
   }
 
   void _addOrDeleteItem(Part part) {
@@ -38,10 +32,9 @@ class _ImagesPartsState extends State<ImagesParts> {
       });
     } else {
       setState(() {
-        selectedPartsList[part.title] = part;
+        selectedPartsList[part.title] = [part, 0];
       });
     }
-    debugPrint('selectedPartsList: ${selectedPartsList.keys}');
   }
 
   @override
