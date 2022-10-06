@@ -114,7 +114,6 @@ class _PartsSettingsScreenState extends State<PartsSettingsScreen> {
                   : Column(
                       children: [
                         Container(
-                          ///color: Colors.amber,
                           width: MediaQuery.of(context).size.width,
                           padding: const EdgeInsets.symmetric(vertical: 20),
                           child: _pageIndicator(),
@@ -146,7 +145,7 @@ class _PartsSettingsScreenState extends State<PartsSettingsScreen> {
               pageCount: 3,
               dotRadius: 10,
               dotOutlineThickness: 2,
-              spacing: 20,
+              spacing: 30,
               scrollPosition:
                   _pageController.hasClients ? _pageController.page! : 0.0,
               dotFillColor: Colors.black12,

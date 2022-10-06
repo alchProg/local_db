@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:local_db/models/part_model.dart';
-import 'package:local_db/widget/price_item_widget.dart';
+import 'package:local_db/models/price_list_items_model.dart';
+import 'package:local_db/screens/price_list/components/price_item_widget.dart';
 
 class StandartItems extends StatelessWidget {
   final VoidCallback? onDissmissed;
@@ -17,6 +18,16 @@ class StandartItems extends StatelessWidget {
     _onDissmissed();
   }
 
+  void _onPriceChangedUpdate(int totalPrice) {
+    ValueChanged<int>? _onPriceChanged = onPriceChanged;
+    if (_onPriceChanged == null) {
+      return;
+    }
+    _onPriceChanged(totalPrice);
+  }
+
+  num totalPrice = 0;
+
   @override
   Widget build(BuildContext context) {
     for (List part in selectedPartsList.values) {
@@ -32,9 +43,13 @@ class StandartItems extends StatelessWidget {
             onIndexChanged: (newIndex) {
               part[1] = newIndex;
             },
-            onPriceChanged: onPriceChanged,
+            onPriceChanged: (deltaPrice) {
+              totalPrice += deltaPrice;
+            },
           )));
+      print(totalPrice);
     }
+    _onPriceChangedUpdate(totalPrice.toInt());
     return Container(
       decoration: const BoxDecoration(
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(10)),
@@ -51,16 +66,3 @@ class StandartItems extends StatelessWidget {
     );
   }
 }
-
-// onDissmised
-          // setState(() {
-          //   selectedPartsList.remove(part[0].title);
-          //   int newPrice =
-          //       _parseReplace(priceOfListController.text) - currentPrice;
-          //   priceOfListController.text = NumberFormat.currency(
-          //           locale: 'Ru-ru', symbol: '₽', decimalDigits: 0)
-          //       .format(newPrice);
-          // });
-
-// onPriceChanged
-        //currentPrice = newPrice;

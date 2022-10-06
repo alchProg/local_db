@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
 import 'package:intl/intl.dart';
-import 'package:local_db/models/price_list_items_model.dart';
+import 'package:local_db/models/page_indicator_model.dart';
 import 'package:local_db/models/price_list_model.dart';
 import 'package:local_db/screens/price_list/components/standart_items.dart';
 import 'package:local_db/screens/price_list/components/user_items.dart';
@@ -69,6 +69,11 @@ class _PriceListScreenState extends State<PriceListScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              Container(
+                width: MediaQuery.of(context).size.width,
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                child: _pageIndicator(),
+              ),
               Expanded(
                 child: PageView.builder(
                     controller: _pageController,
@@ -81,22 +86,29 @@ class _PriceListScreenState extends State<PriceListScreen> {
                               int newPrice =
                                   _parseReplace(priceOfListController.text) -
                                       currentPrice;
-                              priceOfListController.text = NumberFormat.currency(
-                                      locale: 'Ru-ru',
-                                      symbol: '₽',
-                                      decimalDigits: 0)
-                                  .format(newPrice);
+                              priceOfListController.text =
+                                  NumberFormat.currency(
+                                          locale: 'Ru-ru',
+                                          symbol: '₽',
+                                          decimalDigits: 0)
+                                      .format(newPrice);
                             });
                           },
                           onPriceChanged: (newPrice) {
                             currentPrice = newPrice;
+                            Future.delayed(const Duration(milliseconds: 10),
+                                () {
+                              priceOfListController.text = NumberFormat.currency(
+                                    locale: 'Ru-ru',
+                                    symbol: '₽',
+                                    decimalDigits: 0)
+                                .format(currentPrice);
+                            });
                           },
                         );
                       } else {
                         return UserItems(
-                          onDissmissed: () {
-                            
-                          },
+                          onDissmissed: () {},
                         );
                       }
                     }),
@@ -116,6 +128,68 @@ class _PriceListScreenState extends State<PriceListScreen> {
   int _parseReplace(String inputStr) {
     RegExp regEx = RegExp(r'[^0-9]');
     return int.parse(inputStr.replaceAll(regEx, ''));
+  }
+
+  Color _color(Color activ, Color unActiv) {
+    bool isSwaped =
+        _pageController.hasClients ? _pageController.page! > 0.5 : false;
+    return isSwaped ? unActiv : activ;
+  }
+
+  Widget _pageIndicator() {
+    return AnimatedBuilder(
+        animation: _pageController,
+        builder: (context, snapshot) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.35,
+                child: AnimatedDefaultTextStyle(
+                    duration: const Duration(milliseconds: 300),
+                    style: TextStyle(
+                        color: _color(Colors.teal, Colors.black26),
+                        fontSize: 16),
+                    child: const Text(
+                      "Стандартные",
+                      textAlign: TextAlign.right,
+                    )),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 0),
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.2,
+                  child: CustomPaint(
+                    painter: PageIndicatorPainter(
+                      pageCount: 2,
+                      dotRadius: 10,
+                      dotOutlineThickness: 2,
+                      spacing: 30,
+                      scrollPosition: _pageController.hasClients
+                          ? _pageController.page!
+                          : 0.0,
+                      dotFillColor: Colors.black12,
+                      dotOutlineColor: Colors.black38,
+                      indcatorColor: Colors.teal,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.35,
+                child: AnimatedDefaultTextStyle(
+                    duration: const Duration(milliseconds: 300),
+                    style: TextStyle(
+                        color: _color(Colors.black38, Colors.teal),
+                        fontSize: 16),
+                    child: const Text(
+                      "Свои",
+                      textAlign: TextAlign.left,
+                    )),
+              ),
+            ],
+          );
+        });
   }
 
   Widget _totalPriceBuilder() {

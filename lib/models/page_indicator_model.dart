@@ -71,7 +71,6 @@ class PageIndicatorPainter extends CustomPainter {
 
     for (int i = 0; i < pageCount; ++i) {
       _drowDot(canvas, dotCenter);
-
       dotCenter = dotCenter.translate((2 * dotRadius) + spacing, 0);
     }
   }

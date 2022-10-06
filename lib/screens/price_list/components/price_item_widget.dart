@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:local_db/models/price_list_items_model.dart';
 import 'package:local_db/models/price_list_model.dart';
 import 'package:local_db/widget/fmi_widget.dart';
-import '../models/part_model.dart';
+import '../../../models/part_model.dart';
 
 class PriceItemWidget extends StatefulWidget {
   const PriceItemWidget({
@@ -35,7 +35,6 @@ class _PriceItemWidgetState extends State<PriceItemWidget> {
   @override
   void initState() {
     _dataInit();
-    _listPriceUpdate();
     standartPriceItemsList[_priceItem.title] = _priceItem;
     super.initState();
   }
@@ -56,6 +55,8 @@ class _PriceItemWidgetState extends State<PriceItemWidget> {
       desc: _currentData[_priceIndex][1],
       price: _currentData[_priceIndex][2],
     );
+
+    _oldItemPrice = _priceItem.price!;
   }
 
   int _parseReplace(String inputStr) {
@@ -63,21 +64,12 @@ class _PriceItemWidgetState extends State<PriceItemWidget> {
     return int.parse(inputStr.replaceAll(regEx, ''));
   }
 
-  void _listPriceUpdate() {
-    _oldItemPrice = _priceItem.price!;
-    int currentListPrice =
-        _parseReplace(priceOfListController.text) + _oldItemPrice;
-    // priceOfListController.text =
-    //     NumberFormat.currency(locale: 'Ru-ru', symbol: '₽', decimalDigits: 0)
-    //         .format(currentListPrice);
-  }
-
   void _onPriceChanged() {
     ValueChanged<int>? onPriceChanged = widget.onPriceChanged;
     if (onPriceChanged == null) {
       return;
     }
-    onPriceChanged(_priceItem.price!);
+    onPriceChanged(_priceItem.price! - _oldItemPrice);
   }
 
   void _onIndexChanged() {
