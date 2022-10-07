@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
 import 'package:intl/intl.dart';
 import 'package:local_db/models/page_indicator_model.dart';
 import 'package:local_db/models/price_list_model.dart';
+import 'package:local_db/screens/price_list/components/counter_bloc.dart';
 import 'package:local_db/screens/price_list/components/standart_items.dart';
 import 'package:local_db/screens/price_list/components/user_items.dart';
 import 'package:local_db/widget/fmi_widget.dart';
@@ -61,64 +63,47 @@ class _PriceListScreenState extends State<PriceListScreen> {
   late int currentPrice;
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _appBar(),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(5),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                width: MediaQuery.of(context).size.width,
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                child: _pageIndicator(),
-              ),
-              Expanded(
-                child: PageView.builder(
-                    controller: _pageController,
-                    itemCount: 2,
-                    itemBuilder: (context, index) {
-                      if (index == 0) {
-                        return StandartItems(
-                          onDissmissed: () {
-                            setState(() {
-                              int newPrice =
-                                  _parseReplace(priceOfListController.text) -
-                                      currentPrice;
-                              priceOfListController.text =
-                                  NumberFormat.currency(
-                                          locale: 'Ru-ru',
-                                          symbol: '₽',
-                                          decimalDigits: 0)
-                                      .format(newPrice);
-                            });
-                          },
-                          onPriceChanged: (newPrice) {
-                            currentPrice = newPrice;
-                            Future.delayed(const Duration(milliseconds: 10),
-                                () {
-                              priceOfListController.text = NumberFormat.currency(
-                                    locale: 'Ru-ru',
-                                    symbol: '₽',
-                                    decimalDigits: 0)
-                                .format(currentPrice);
-                            });
-                          },
-                        );
-                      } else {
-                        return UserItems(
-                          onDissmissed: () {},
-                        );
-                      }
-                    }),
-              ),
-              const Divider(
-                color: Colors.white,
-                height: 3,
-              ),
-              _totalPriceBuilder(),
-            ],
+    return BlocProvider<CounterBloc>(
+      create: (_) => CounterBloc(),
+      child: Scaffold(
+        appBar: _appBar(),
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(5),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  child: _pageIndicator(),
+                ),
+                Expanded(
+                  child: PageView.builder(
+                      controller: _pageController,
+                      itemCount: 2,
+                      itemBuilder: (context, index) {
+                        if (index == 0) {
+                          return StandartItems(
+                            onDissmissed: () {
+                            },
+                            onPriceChanged: (newPrice) {
+                            },
+                          );
+                        } else {
+                          return UserItems(
+                            onDissmissed: () {},
+                          );
+                        }
+                      }),
+                ),
+                const Divider(
+                  color: Colors.white,
+                  height: 3,
+                ),
+                _totalPriceBuilder(),
+              ],
+            ),
           ),
         ),
       ),
@@ -209,19 +194,26 @@ class _PriceListScreenState extends State<PriceListScreen> {
                   fontSize: 24,
                   fontWeight: FontWeight.bold),
             ),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.5,
-              child: TextField(
-                readOnly: true,
-                maxLength: 20,
-                controller: priceOfListController,
-                style: const TextStyle(
-                  fontSize: 24,
-                  color: Colors.lightGreen,
-                ),
-                decoration: const InputDecoration(
-                    counterText: '', border: InputBorder.none),
-              ),
+            BlocBuilder<CounterBloc, int>(
+              builder: (context, state) {
+                return SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.5,
+                  child: Text(NumberFormat.currency(
+                          locale: 'Ru-ru', symbol: '₽', decimalDigits: 0)
+                      .format(state)),
+                  // TextField(
+                  //   readOnly: true,
+                  //   maxLength: 20,
+                  //   controller: priceOfListController,
+                  //   style: const TextStyle(
+                  //     fontSize: 24,
+                  //     color: Colors.lightGreen,
+                  //   ),
+                  //   decoration: const InputDecoration(
+                  //       counterText: '', border: InputBorder.none),
+                  // ),
+                );
+              },
             )
           ],
         ));

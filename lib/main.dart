@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:local_db/screens/price_list/components/counter_bloc.dart';
 import 'package:local_db/screens/profiles_screen.dart';
 
 void main() {
@@ -15,11 +17,13 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData.dark(
-        //scaffoldBackgroundColor: Colors.blueGrey,
-        //primarySwatch: Color(),
+          //scaffoldBackgroundColor: Colors.blueGrey,
+          //primarySwatch: Color(),
+          ),
+      home: BlocProvider(
+        create: (_) => CounterBloc(),
+        child: const ProfilesScreen(),
       ),
-      home: const ProfilesScreen(),
     );
   }
 }
-

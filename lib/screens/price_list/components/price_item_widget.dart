@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+// import 'package:flutter/scheduler.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
 import 'package:intl/intl.dart';
 import 'package:local_db/models/price_list_items_model.dart';
-import 'package:local_db/models/price_list_model.dart';
+// import 'package:local_db/models/price_list_model.dart';
+import 'package:local_db/screens/price_list/components/counter_bloc.dart';
 import 'package:local_db/widget/fmi_widget.dart';
 import '../../../models/part_model.dart';
 
 class PriceItemWidget extends StatefulWidget {
-  const PriceItemWidget({
+  PriceItemWidget({
     Key? key,
     required this.part,
     this.onIndexChanged,
@@ -35,20 +38,17 @@ class _PriceItemWidgetState extends State<PriceItemWidget> {
   @override
   void initState() {
     _dataInit();
-    standartPriceItemsList[_priceItem.title] = _priceItem;
     super.initState();
   }
 
   void _dataInit() {
     _priceIndex = widget.dataIndex;
-
     _currentData = [
       [Icons.looks_one_rounded, widget.part.desc1!, widget.part.price1!],
       [Icons.looks_two_rounded, widget.part.desc2!, widget.part.price2!],
       [Icons.looks_3_rounded, widget.part.desc3!, widget.part.price3!],
       [Icons.looks_4_rounded, widget.part.desc4!, widget.part.price4!],
     ];
-
     _priceIcon = _currentData[_priceIndex][0];
     _priceItem = PriceListItem(
       title: widget.part.title,
@@ -59,117 +59,115 @@ class _PriceItemWidgetState extends State<PriceItemWidget> {
     _oldItemPrice = _priceItem.price!;
   }
 
-  int _parseReplace(String inputStr) {
-    RegExp regEx = RegExp(r'[^0-9]');
-    return int.parse(inputStr.replaceAll(regEx, ''));
-  }
-
-  void _onPriceChanged() {
-    ValueChanged<int>? onPriceChanged = widget.onPriceChanged;
-    if (onPriceChanged == null) {
+  // int _parseReplace(String inputStr) {
+  void _onIndexChangedUpdate() {
+    ValueChanged<int>? _onIndexChanged = widget.onIndexChanged;
+    if (_onIndexChanged == null) {
       return;
     }
-    onPriceChanged(_priceItem.price! - _oldItemPrice);
-  }
-
-  void _onIndexChanged() {
-    ValueChanged<int>? onIndexChanged = widget.onIndexChanged;
-    if (onIndexChanged == null) {
-      return;
-    }
-    onIndexChanged(_priceIndex);
+    _onIndexChanged(_priceIndex);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: Colors.black,
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Padding(
-          padding: EdgeInsets.zero,
-          child: ListTile(
-            title: Text(
-              _priceItem.title,
-              textAlign: TextAlign.left,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+    _dataInit();
+    context.read<CounterBloc>().add(Increment(value: _priceItem.price!));
+    return Dismissible(
+      key: Key(_priceItem.title),
+      onDismissed: (direction) {
+        selectedPartsList.remove(widget.part.title);
+        context.read<CounterBloc>().add(Decrement(value: _priceItem.price!));
+      },
+      child: Card(
+        color: Colors.black,
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Padding(
+            padding: EdgeInsets.zero,
+            child: ListTile(
+              title: Text(
+                _priceItem.title,
+                textAlign: TextAlign.left,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              trailing: _focusedMenu(context),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(2),
+            child: Container(
+              decoration: BoxDecoration(
+                  color:
+                      ThemeData.dark().dialogBackgroundColor.withOpacity(0.5),
+                  borderRadius: const BorderRadius.vertical(
+                    bottom: Radius.circular(4),
+                  )),
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              height: 30,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Icon(
+                        _priceIcon,
+                        size: 20,
+                        color: Colors.black,
+                        shadows: const [
+                          Shadow(
+                              color: Colors.white,
+                              blurRadius: 15,
+                              offset: Offset(0, 0)),
+                          Shadow(
+                              color: Colors.white,
+                              blurRadius: 15,
+                              offset: Offset(0, 0)),
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                          width: 1,
+                          height: 25,
+                          color: Colors.white38,
+                        ),
+                      ),
+                      Text(
+                        NumberFormat.currency(
+                                locale: 'Ru-ru', symbol: '₽', decimalDigits: 0)
+                            .format(_priceItem.price),
+                        textAlign: TextAlign.left,
+                        style: const TextStyle(
+                          color: Colors.greenAccent,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    _priceItem.desc!,
+                    textAlign: TextAlign.left,
+                    style: const TextStyle(
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
               ),
             ),
-            trailing: _focusedMenu(),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(2),
-          child: Container(
-            decoration: BoxDecoration(
-                color: ThemeData.dark().dialogBackgroundColor.withOpacity(0.5),
-                borderRadius: const BorderRadius.vertical(
-                  bottom: Radius.circular(4),
-                )),
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            height: 30,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Icon(
-                      _priceIcon,
-                      size: 20,
-                      color: Colors.black,
-                      shadows: const [
-                        Shadow(
-                            color: Colors.white,
-                            blurRadius: 15,
-                            offset: Offset(0, 0)),
-                        Shadow(
-                            color: Colors.white,
-                            blurRadius: 15,
-                            offset: Offset(0, 0)),
-                      ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Container(
-                        width: 1,
-                        height: 25,
-                        color: Colors.white38,
-                      ),
-                    ),
-                    Text(
-                      NumberFormat.currency(
-                              locale: 'Ru-ru', symbol: '₽', decimalDigits: 0)
-                          .format(_priceItem.price),
-                      textAlign: TextAlign.left,
-                      style: const TextStyle(
-                        color: Colors.greenAccent,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ],
-                ),
-                Text(
-                  _priceItem.desc!,
-                  textAlign: TextAlign.left,
-                  style: const TextStyle(
-                    fontSize: 14,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        )
-      ]),
+          )
+        ]),
+      ),
     );
   }
 
-  _focusedMenu() {
+  _focusedMenu(context) {
     return FocusedMenuHolder(
       onPressed: () {},
-      menuItems: _focusedMenuItems(),
+      menuItems: _focusedMenuItems(context),
       menuWidth: MediaQuery.of(context).size.width * 0.8,
       menuItemExtent: MediaQuery.of(context).size.height * 0.07,
       openWithTap: true,
@@ -187,7 +185,7 @@ class _PriceItemWidgetState extends State<PriceItemWidget> {
     );
   }
 
-  _focusedMenuItems() {
+  _focusedMenuItems(BuildContext context) {
     List<FocusedMenuItem> focusedMenuItemList = <FocusedMenuItem>[];
     List<dynamic> cdt = _currentData;
     for (int i = 0; i < _currentData.length; i++) {
@@ -200,18 +198,13 @@ class _PriceItemWidgetState extends State<PriceItemWidget> {
               _priceIcon = cdt[i][0];
               _priceItem.desc = cdt[i][1];
               _priceItem.price = cdt[i][2];
-
-              int newPrice = _parseReplace(priceOfListController.text) +
-                  (-_oldItemPrice + _priceItem.price!);
-              priceOfListController.text = NumberFormat.currency(
-                      locale: 'Ru-ru', symbol: '₽', decimalDigits: 0)
-                  .format(newPrice);
-              _oldItemPrice = _priceItem.price!;
-              _priceIndex = i;
-              _onIndexChanged();
-              _onPriceChanged();
-              // const PriceListScreen().createState().reassemble();
             });
+            int newPrice = (_priceItem.price! - _oldItemPrice);
+            _oldItemPrice = _priceItem.price!;
+            _priceIndex = i;
+            _onIndexChangedUpdate();
+            context.read<CounterBloc>().add(Increment(value: newPrice));
+            // _onPriceChanged();
           },
           context: context,
         ).itemT0());
