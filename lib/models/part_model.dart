@@ -1,7 +1,5 @@
 const String tableCarParts = 'parts';
 
-Map<String,List> selectedPartsList = {};
-
 class PartFields {
   static final List<String> values = [
     id, pID, side, carType, title,

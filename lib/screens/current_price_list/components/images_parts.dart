@@ -1,38 +1,40 @@
-import 'package:local_db/db/local_database.dart';
 import 'package:local_db/generated/assets.dart';
 import 'package:flutter/material.dart';
-import 'package:local_db/models/normal_parts_lib.dart';
+import 'package:local_db/models/standart_parts_lib.dart';
 import 'package:local_db/models/part_model.dart';
-import 'package:local_db/models/price_list_model.dart';
 import 'package:local_db/models/screen_part_model.dart';
 
 class ImagesParts extends StatefulWidget {
   final int pID;
   final String carType;
+  final Map<String, List<dynamic>> selectedPartsList;
 
-  const ImagesParts({Key? key, required this.pID, required this.carType})
-      : super(key: key);
+  const ImagesParts({
+    Key? key,
+    required this.pID,
+    required this.carType,
+    required this.selectedPartsList,
+  }) : super(key: key);
 
   @override
   State<ImagesParts> createState() => _ImagesPartsState();
 }
 
 class _ImagesPartsState extends State<ImagesParts> {
-
   @override
   void initState() {
     super.initState();
   }
 
   void _addOrDeleteItem(Part part) {
-    final isContain = selectedPartsList.containsKey(part.title);
+    final isContain = widget.selectedPartsList.containsKey(part.title);
     if (isContain) {
       setState(() {
-        selectedPartsList.remove(part.title);
+        widget.selectedPartsList.remove(part.title);
       });
     } else {
       setState(() {
-        selectedPartsList[part.title] = [part, 0];
+        widget.selectedPartsList[part.title] = [part, 0];
       });
     }
   }
@@ -59,6 +61,7 @@ class _ImagesPartsState extends State<ImagesParts> {
               left: [parts[4].sWidth! * 0.4],
               top: [parts[10].cHeight! * 1.1],
               getPart: (part) => _addOrDeleteItem(part),
+              selectedPartsList: widget.selectedPartsList,
             ),
 
             ScreenPartWidget(
@@ -71,6 +74,7 @@ class _ImagesPartsState extends State<ImagesParts> {
               left: [parts[4].sWidth],
               top: [parts[10].cHeight, parts[10].sHeight! * 0.85],
               getPart: (part) => _addOrDeleteItem(part),
+              selectedPartsList: widget.selectedPartsList,
             ),
             ScreenPartWidget(
               nPart: parts[12],
@@ -82,6 +86,7 @@ class _ImagesPartsState extends State<ImagesParts> {
               left: [parts[0].sWidth! * 0.9],
               top: [parts[10].cHeight! * 1.1],
               getPart: (part) => _addOrDeleteItem(part),
+              selectedPartsList: widget.selectedPartsList,
             ),
             ScreenPartWidget(
               nPart: parts[1],
@@ -97,6 +102,7 @@ class _ImagesPartsState extends State<ImagesParts> {
                 parts[0].sHeight! * 0.85,
               ],
               getPart: (part) => _addOrDeleteItem(part),
+              selectedPartsList: widget.selectedPartsList,
             ),
             ScreenPartWidget(
               nPart: parts[2],
@@ -112,6 +118,7 @@ class _ImagesPartsState extends State<ImagesParts> {
                 parts[0].sHeight! * 0.88,
               ],
               getPart: (part) => _addOrDeleteItem(part),
+              selectedPartsList: widget.selectedPartsList,
             ),
             ScreenPartWidget(
               nPart: parts[3],
@@ -128,6 +135,7 @@ class _ImagesPartsState extends State<ImagesParts> {
                 parts[3].sHeight!,
               ],
               getPart: (part) => _addOrDeleteItem(part),
+              selectedPartsList: widget.selectedPartsList,
             ),
             ScreenPartWidget(
               nPart: parts[4],
@@ -143,6 +151,7 @@ class _ImagesPartsState extends State<ImagesParts> {
                 parts[0].sHeight! * 0.8,
               ],
               getPart: (part) => _addOrDeleteItem(part),
+              selectedPartsList: widget.selectedPartsList,
             ),
             ScreenPartWidget(
               nPart: parts[13],
@@ -162,6 +171,7 @@ class _ImagesPartsState extends State<ImagesParts> {
                 parts[1].sHeight! * 0.88,
               ],
               getPart: (part) => _addOrDeleteItem(part),
+              selectedPartsList: widget.selectedPartsList,
             ),
             ScreenPartWidget(
               nPart: parts[11],
@@ -180,6 +190,7 @@ class _ImagesPartsState extends State<ImagesParts> {
                 parts[1].sHeight! * 0.81,
               ],
               getPart: (part) => _addOrDeleteItem(part),
+              selectedPartsList: widget.selectedPartsList,
             ),
 
             // //Centre
@@ -192,6 +203,7 @@ class _ImagesPartsState extends State<ImagesParts> {
               xScale: xScale,
               top: const [5],
               getPart: (part) => _addOrDeleteItem(part),
+              selectedPartsList: widget.selectedPartsList,
             ),
             ScreenPartWidget(
               nPart: parts[12],
@@ -202,6 +214,7 @@ class _ImagesPartsState extends State<ImagesParts> {
               xScale: xScale,
               top: [parts[10].cHeight! * 1.1],
               getPart: (part) => _addOrDeleteItem(part),
+              selectedPartsList: widget.selectedPartsList,
             ),
             ScreenPartWidget(
               nPart: parts[14],
@@ -217,6 +230,7 @@ class _ImagesPartsState extends State<ImagesParts> {
                 parts[1].sHeight! * 0.1,
               ],
               getPart: (part) => _addOrDeleteItem(part),
+              selectedPartsList: widget.selectedPartsList,
             ),
             ScreenPartWidget(
               nPart: parts[13],
@@ -232,6 +246,7 @@ class _ImagesPartsState extends State<ImagesParts> {
                 parts[1].sHeight! * 0.88,
               ],
               getPart: (part) => _addOrDeleteItem(part),
+              selectedPartsList: widget.selectedPartsList,
             ),
             ScreenPartWidget(
               nPart: parts[11],
@@ -239,6 +254,7 @@ class _ImagesPartsState extends State<ImagesParts> {
               carType: widget.carType,
               isSide: false,
               assetName: Assets.partsOfCarCRearBumper,
+              selectedPartsList: widget.selectedPartsList,
               xScale: xScale,
               top: [
                 parts[10].cHeight,
@@ -261,6 +277,7 @@ class _ImagesPartsState extends State<ImagesParts> {
               right: [parts[4].sWidth! * 0.4],
               top: [parts[10].cHeight! * 1.1],
               getPart: (part) => _addOrDeleteItem(part),
+              selectedPartsList: widget.selectedPartsList,
             ),
 
             ScreenPartWidget(
@@ -273,6 +290,7 @@ class _ImagesPartsState extends State<ImagesParts> {
               right: [parts[4].sWidth],
               top: [parts[10].cHeight, parts[10].sHeight! * 0.85],
               getPart: (part) => _addOrDeleteItem(part),
+              selectedPartsList: widget.selectedPartsList,
             ),
             ScreenPartWidget(
               nPart: parts[12],
@@ -284,6 +302,7 @@ class _ImagesPartsState extends State<ImagesParts> {
               right: [parts[0].sWidth! * 0.9],
               top: [parts[10].cHeight! * 1.1],
               getPart: (part) => _addOrDeleteItem(part),
+              selectedPartsList: widget.selectedPartsList,
             ),
             ScreenPartWidget(
               nPart: parts[6],
@@ -299,6 +318,7 @@ class _ImagesPartsState extends State<ImagesParts> {
                 parts[0].sHeight! * 0.85,
               ],
               getPart: (part) => _addOrDeleteItem(part),
+              selectedPartsList: widget.selectedPartsList,
             ),
             ScreenPartWidget(
               nPart: parts[7],
@@ -314,6 +334,7 @@ class _ImagesPartsState extends State<ImagesParts> {
                 parts[0].sHeight! * 0.88,
               ],
               getPart: (part) => _addOrDeleteItem(part),
+              selectedPartsList: widget.selectedPartsList,
             ),
             ScreenPartWidget(
               nPart: parts[8],
@@ -330,6 +351,7 @@ class _ImagesPartsState extends State<ImagesParts> {
                 parts[3].sHeight!,
               ],
               getPart: (part) => _addOrDeleteItem(part),
+              selectedPartsList: widget.selectedPartsList,
             ),
             ScreenPartWidget(
               nPart: parts[9],
@@ -345,6 +367,7 @@ class _ImagesPartsState extends State<ImagesParts> {
                 parts[0].sHeight! * 0.8,
               ],
               getPart: (part) => _addOrDeleteItem(part),
+              selectedPartsList: widget.selectedPartsList,
             ),
             ScreenPartWidget(
               nPart: parts[13],
@@ -364,6 +387,7 @@ class _ImagesPartsState extends State<ImagesParts> {
                 parts[1].sHeight! * 0.88,
               ],
               getPart: (part) => _addOrDeleteItem(part),
+              selectedPartsList: widget.selectedPartsList,
             ),
             ScreenPartWidget(
               nPart: parts[11],
@@ -382,6 +406,7 @@ class _ImagesPartsState extends State<ImagesParts> {
                 parts[1].sHeight! * 0.81,
               ],
               getPart: (part) => _addOrDeleteItem(part),
+              selectedPartsList: widget.selectedPartsList,
             ),
           ],
         ),

@@ -1,29 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:local_db/db/local_database.dart';
 import 'package:local_db/models/part_model.dart';
-import 'package:local_db/widget/part_form_widget.dart';
-import '../db/local_database.dart';
-
-
-
+import 'package:local_db/screens/part/components/part_form_widget.dart';
 
 class AddEditPartScreen extends StatefulWidget {
   final int pID;
   final String pName;
   final Part? part;
 
-
-  const AddEditPartScreen({
-    Key? key,
-    required this.pID,
-    required this.pName,
-    this.part }) : super(key: key);
+  const AddEditPartScreen(
+      {Key? key, required this.pID, required this.pName, this.part})
+      : super(key: key);
 
   @override
   _AddEditPartScreenState createState() => _AddEditPartScreenState();
 }
 
 class _AddEditPartScreenState extends State<AddEditPartScreen> {
-
   final formKey = GlobalKey<FormState>();
   late String title;
   late String buttonTxt;
@@ -76,29 +69,29 @@ class _AddEditPartScreenState extends State<AddEditPartScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          title.isEmpty
-              ? 'Деталь - новая'
-              : 'Деталь - редакт',
+          title.isEmpty ? 'Деталь - новая' : 'Деталь - редакт',
           style: const TextStyle(fontSize: 24),
         ),
         actions: [buildButton()],
       ),
       body: Form(
-          key: formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              header(),
-              Expanded(
-                child: ListView.builder(
+        key: formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            header(),
+            Expanded(
+              child: ListView.builder(
                   primary: true,
                   itemCount: items.length,
-                  itemBuilder: (ctx, i){
+                  itemBuilder: (ctx, i) {
                     BorderRadius? borderRadius;
-                    if(i == 0){
-                      borderRadius = const BorderRadius.vertical(top: Radius.circular(20));
-                    } else if (i == items.length - 1){
-                      borderRadius = const BorderRadius.vertical(bottom: Radius.circular(20));
+                    if (i == 0) {
+                      borderRadius =
+                          const BorderRadius.vertical(top: Radius.circular(20));
+                    } else if (i == items.length - 1) {
+                      borderRadius = const BorderRadius.vertical(
+                          bottom: Radius.circular(20));
                     }
                     return PartFormWidget(
                       price: items[i][0],
@@ -110,31 +103,36 @@ class _AddEditPartScreenState extends State<AddEditPartScreen> {
                       borderRadius: borderRadius,
                     );
                   }),
-              ),
-            ],
-          ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget header () {
+  Widget header() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 3),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10),
         decoration: BoxDecoration(
           color: Colors.black.withOpacity(0.5),
-          borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
+          borderRadius:
+              const BorderRadius.vertical(bottom: Radius.circular(20)),
         ),
         child: ListTile(
-          title: Text(title, style: const TextStyle(fontSize: 24),),
-          subtitle: Text(widget.pName, style: const TextStyle(fontSize: 14),),
+          title: Text(
+            title,
+            style: const TextStyle(fontSize: 24),
+          ),
+          subtitle: Text(
+            widget.pName,
+            style: const TextStyle(fontSize: 14),
+          ),
         ),
       ),
     );
   }
-
-
 
   Widget buildButton() {
     final isFormValid = title.isNotEmpty;
@@ -143,7 +141,8 @@ class _AddEditPartScreenState extends State<AddEditPartScreen> {
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          foregroundColor: Colors.white, backgroundColor: isFormValid ? null : Colors.grey.shade700,
+          foregroundColor: Colors.white,
+          backgroundColor: isFormValid ? null : Colors.grey.shade700,
         ),
         onPressed: _addOrUpdatePart,
         child: Text(buttonTxt),
@@ -186,6 +185,5 @@ class _AddEditPartScreenState extends State<AddEditPartScreen> {
       price1: int.parse(price1),
     );
     await LocalDatabase.instance.createPart(part);
-
   }
 }

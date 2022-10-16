@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:local_db/db/local_database.dart';
-import 'package:local_db/models/normal_parts_lib.dart';
+import 'package:local_db/models/standart_parts_lib.dart';
 import 'package:local_db/models/part_model.dart';
 
 class ScreenPartWidget extends StatefulWidget {
-  final NormalPart nPart;
+  final StandartPart nPart;
   final int pID;
   final String carType;
   final String assetName;
@@ -19,6 +19,7 @@ class ScreenPartWidget extends StatefulWidget {
   final List<double?>? bottom;
   final ValueSetter<Part>? getPart;
   final bool isSide;
+  final Map<String, List<dynamic>> selectedPartsList;
 
   const ScreenPartWidget({
     Key? key,
@@ -26,6 +27,7 @@ class ScreenPartWidget extends StatefulWidget {
     required this.pID,
     required this.carType,
     required this.assetName,
+    required this.selectedPartsList,
     this.color,
     this.xScale,
     this.width,
@@ -127,7 +129,7 @@ class _ScreenPartWidgetState extends State<ScreenPartWidget> {
   }
 
   Color _setColor() {
-    final isContain = selectedPartsList.containsKey(part.title);
+    final isContain = widget.selectedPartsList.containsKey(part.title);
     if (isContain) {
       return Colors.blueAccent;
     } else {

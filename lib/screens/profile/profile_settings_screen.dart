@@ -3,11 +3,11 @@ import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
 import 'package:local_db/db/local_database.dart';
 import 'package:local_db/models/page_indicator_model.dart';
-import '../models/car_model.dart';
-import '../models/part_model.dart';
-import '../widget/fmi_widget.dart';
-import '../widget/parts_side_slide_items.dart';
-import 'add_edit_car_screen.dart';
+import '../car/components/car_model.dart';
+import '../../models/part_model.dart';
+import '../../widget/fmi_widget.dart';
+import 'components/parts_side_slide_items.dart';
+import '../car/add_edit_car_screen.dart';
 
 class PartsSettingsScreen extends StatefulWidget {
   final int pID;
@@ -265,7 +265,8 @@ class _PartsSettingsScreenState extends State<PartsSettingsScreen> {
       }
     }
 
-    focusedMenuItemList.add(FocusItem(
+    focusedMenuItemList.add(
+      FocusItem(
             title: "Добавить",
             onPressed: () async {
               await Navigator.of(context).push(MaterialPageRoute(

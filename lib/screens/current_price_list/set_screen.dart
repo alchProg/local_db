@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
 import 'package:local_db/db/local_database.dart';
-import 'package:local_db/models/car_model.dart';
-import 'package:local_db/models/part_model.dart';
+import 'package:local_db/screens/car/components/car_model.dart';
 import 'package:local_db/models/price_list_items_model.dart';
-import 'package:local_db/screens/price_list/price_list_screen.dart';
-import 'package:local_db/screens/profile_settings_screen.dart';
+import 'package:local_db/screens/current_price_list/current_price_list_screen.dart';
+import 'package:local_db/screens/profile/profile_settings_screen.dart';
 import 'package:local_db/widget/fmi_widget.dart';
-import 'package:local_db/widget/images_parts.dart';
+import 'package:local_db/screens/current_price_list/components/images_parts.dart';
 
 class SetScreen extends StatefulWidget {
   final int pID;
@@ -21,6 +20,8 @@ class SetScreen extends StatefulWidget {
 }
 
 class _SetScreenState extends State<SetScreen> {
+  late Map<String, List<dynamic>> selectedPartsList;
+  late Map<String, PriceListItem> userPriceItemsList, standartPriceItemsList;
   late List<Car> cars;
   bool isLoading = true;
   String currentCarType = '------';
@@ -32,6 +33,9 @@ class _SetScreenState extends State<SetScreen> {
 
   @override
   void initState() {
+    selectedPartsList = {};
+    userPriceItemsList = {};
+    standartPriceItemsList = {};
     partsAndCarsInit();
     super.initState();
   }
@@ -40,6 +44,7 @@ class _SetScreenState extends State<SetScreen> {
   void dispose() {
     selectedPartsList.clear();
     userPriceItemsList.clear();
+    standartPriceItemsList.clear();
     super.dispose();
   }
 
@@ -86,62 +91,17 @@ class _SetScreenState extends State<SetScreen> {
                     child: CircularProgressIndicator(),
                   )
                 : cars.isEmpty
-                    ? Column(
-                        children: [
-                          const Padding(
-                            padding:
-                                EdgeInsets.only(left: 10, top: 30, right: 10),
-                            child: Icon(
-                              Icons.warning_amber_rounded,
-                              size: 100,
-                              color: Colors.red,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(10),
-                            child: Text(
-                              errMsg,
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: const [
-                              Icon(Icons.car_repair),
-                              Text(
-                                "=> 'Добавить'",
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                          ),
-                          ElevatedButton(
-                            onPressed: () async {
-                              await Navigator.of(context)
-                                  .push(MaterialPageRoute(
-                                      builder: (context) => PartsSettingsScreen(
-                                            pID: widget.pID,
-                                            pName: widget.pName,
-                                          )));
-                              currentCarType == '------'
-                                  ? partsAndCarsInit()
-                                  : refreshCars();
-                            },
-                            child: const Text(
-                              "Настройка профиля",
-                              textAlign: TextAlign.center,
-                            ),
-                          )
-                        ],
-                      )
+                    ? _carsIsEmpty()
                     : Center(
                         child: InteractiveViewer(
-                          panEnabled: false, // Set it to false
+                          panEnabled: false,
                           boundaryMargin: const EdgeInsets.all(10),
                           minScale: 0.5,
                           maxScale: 1.5,
                           child: ImagesParts(
                             pID: widget.pID,
                             carType: currentCarType,
+                            selectedPartsList: selectedPartsList,
                           ),
                         ),
                       ),
@@ -149,11 +109,15 @@ class _SetScreenState extends State<SetScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        //backgroundColor: Colors.brown,
         child: const Icon(Icons.arrow_forward_ios_rounded),
         onPressed: () async {
-          await Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const PriceListScreen()));
+          await Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => PriceListScreen(
+                    carType: currentCarType,
+                    selectedPartsList: selectedPartsList,
+                    standartPriceItemsList: standartPriceItemsList,
+                    userPriceItemsList: userPriceItemsList,
+                  )));
           _stateUpdate();
         },
       ),
@@ -161,6 +125,48 @@ class _SetScreenState extends State<SetScreen> {
   }
 
   _appBar() {
+    Widget focusedMenu() {
+      List<FocusedMenuItem> focusedMenuItems() {
+        var focusedMenuItemList = <FocusedMenuItem>[];
+        if (cars.isNotEmpty) {
+          for (Car car in cars) {
+            focusedMenuItemList.add(FocusItem(
+              backgroundColor: ThemeData.dark().dialogBackgroundColor,
+              title: car.title,
+              onPressed: () {
+                setState(() => currentCarType = car.title);
+                refreshCars();
+                selectedPartsList.clear();
+              },
+              context: context,
+            ).itemT0());
+          }
+        }
+        return focusedMenuItemList;
+      }
+
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          FocusedMenuHolder(
+            onPressed: () {},
+            menuItems: focusedMenuItems(),
+            menuWidth: MediaQuery.of(context).size.width * 0.8,
+            menuItemExtent: MediaQuery.of(context).size.height * 0.08,
+            openWithTap: true,
+            menuOffset: 10.0,
+            child: const Icon(Icons.car_repair_rounded),
+          ),
+          Text(
+            currentCarType,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 15, color: Colors.lightBlueAccent),
+          ),
+        ],
+      );
+    }
+
     return AppBar(
       automaticallyImplyLeading: false,
       title: Row(
@@ -199,51 +205,55 @@ class _SetScreenState extends State<SetScreen> {
         ],
       ),
       actions: [
-        isLoading ? const CircularProgressIndicator() : _focusedMenu(),
+        isLoading ? const CircularProgressIndicator() : focusedMenu(),
         const SizedBox(width: 12)
       ],
     );
   }
 
-  _focusedMenu() {
+  Widget _carsIsEmpty() {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        FocusedMenuHolder(
-          onPressed: () {},
-          menuItems: _focusedMenuItems(),
-          menuWidth: MediaQuery.of(context).size.width * 0.8,
-          menuItemExtent: MediaQuery.of(context).size.height * 0.08,
-          openWithTap: true,
-          menuOffset: 10.0,
-          child: const Icon(Icons.car_repair_rounded),
+        const Padding(
+          padding: EdgeInsets.only(left: 10, top: 30, right: 10),
+          child: Icon(
+            Icons.warning_amber_rounded,
+            size: 100,
+            color: Colors.red,
+          ),
         ),
-        Text(
-          currentCarType,
-          textAlign: TextAlign.center,
-          style: const TextStyle(fontSize: 15, color: Colors.lightBlueAccent),
+        Padding(
+          padding: const EdgeInsets.all(10),
+          child: Text(
+            errMsg,
+            textAlign: TextAlign.center,
+          ),
         ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            Icon(Icons.car_repair),
+            Text(
+              "=> 'Добавить'",
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+        ElevatedButton(
+          onPressed: () async {
+            await Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => PartsSettingsScreen(
+                      pID: widget.pID,
+                      pName: widget.pName,
+                    )));
+            currentCarType == '------' ? partsAndCarsInit() : refreshCars();
+          },
+          child: const Text(
+            "Настройка профиля",
+            textAlign: TextAlign.center,
+          ),
+        )
       ],
     );
-  }
-
-  _focusedMenuItems() {
-    var focusedMenuItemList = <FocusedMenuItem>[];
-    if (cars.isNotEmpty) {
-      for (Car car in cars) {
-        focusedMenuItemList.add(FocusItem(
-          backgroundColor: ThemeData.dark().dialogBackgroundColor,
-          title: car.title,
-          onPressed: () {
-            setState(() => currentCarType = car.title);
-            refreshCars();
-            selectedPartsList.clear();
-          },
-          context: context,
-        ).itemT0());
-      }
-    }
-    return focusedMenuItemList;
   }
 }

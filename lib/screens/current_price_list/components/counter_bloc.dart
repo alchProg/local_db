@@ -16,11 +16,15 @@ class InitValue extends CounterEvent {
   final int value;
   InitValue({required this.value});
 }
+class RebuildEvent extends CounterEvent {
+  //RebuildEvent();
+}
 
 class CounterBloc extends Bloc<CounterEvent, int> {
   CounterBloc() : super(0) {
     on<InitValue>((event, emit) => emit(event.value));
     on<Increment>((event, emit) => emit(state + event.value));
     on<Decrement>((event, emit) => emit(state - event.value));
+    on<RebuildEvent>((event, emit) => emit(state));
   }
 }

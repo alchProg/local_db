@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:local_db/screens/price_list/components/counter_bloc.dart';
-import 'package:local_db/screens/profiles_screen.dart';
+import 'package:local_db/screens/profile/profiles_screen.dart';
+import 'package:local_db/screens/saved_price_lists/price_lists_screen.dart';
+
+import 'home_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -20,10 +21,12 @@ class MyApp extends StatelessWidget {
           //scaffoldBackgroundColor: Colors.blueGrey,
           //primarySwatch: Color(),
           ),
-      home: BlocProvider(
-        create: (_) => CounterBloc(),
-        child: const ProfilesScreen(),
-      ),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const HomePage(),
+        '/profiles': (context) => const ProfilesScreen(),
+        '/priceLists': (context) => const PriceListsSreen(),
+      },
     );
   }
 }

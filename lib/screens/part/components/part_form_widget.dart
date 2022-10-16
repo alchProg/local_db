@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:validators/validators.dart';
 
 class PartFormWidget extends StatefulWidget {
-
-  final  String? price;
+  final String? price;
   final String? desc;
   final String? labelText;
   final bool? autofocus;
@@ -36,32 +35,30 @@ class _PartFormWidgetState extends State<PartFormWidget> {
   void initState() {
     priceIsTaped = false;
     descIsTaped = false;
-    priceController = TextEditingController(text: widget.price == '0' ? '' : widget.price);
+    priceController =
+        TextEditingController(text: widget.price == '0' ? '' : widget.price);
     descController = TextEditingController(text: widget.desc ?? '');
     super.initState();
   }
 
-  _selectAll(TextEditingController textController){
-    if (textController.text.isEmpty || priceIsTaped){return;}
+  _selectAll(TextEditingController textController) {
+    if (textController.text.isEmpty || priceIsTaped) {
+      return;
+    }
     priceIsTaped = true;
-      return textController.selection = TextSelection(
-          baseOffset: 0,
-          extentOffset: textController.text.length);
+    return textController.selection =
+        TextSelection(baseOffset: 0, extentOffset: textController.text.length);
   }
 
   @override
   Widget build(BuildContext context) {
-  
     return Row(
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 3, top: 3, right: 3),
           child: Container(
             height: 100,
-            width: MediaQuery
-                .of(context)
-                .size
-                .width - 6,
+            width: MediaQuery.of(context).size.width - 6,
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: Colors.black.withOpacity(0.5),
@@ -72,13 +69,11 @@ class _PartFormWidgetState extends State<PartFormWidget> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    width: MediaQuery
-                        .of(context)
-                        .size
-                        .width*0.55,
+                    width: MediaQuery.of(context).size.width * 0.55,
                     decoration: BoxDecoration(
                       color: Colors.black38,
-                      borderRadius: BorderRadius.circular(10),),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                     child: TextFormField(
                       onTap: () => _selectAll(descController),
                       onEditingComplete: () {
@@ -87,7 +82,9 @@ class _PartFormWidgetState extends State<PartFormWidget> {
                       },
                       onChanged: widget.onChangedDesc,
                       validator: (desc) {
-                        if ((priceController.text.isNotEmpty && priceController.text != "0") && desc!.isEmpty) {
+                        if ((priceController.text.isNotEmpty &&
+                                priceController.text != "0") &&
+                            desc!.isEmpty) {
                           return 'Укажите краткое описание цены';
                         } else {
                           return null;
@@ -98,19 +95,14 @@ class _PartFormWidgetState extends State<PartFormWidget> {
                       autofocus: widget.autofocus ?? false,
                       decoration: InputDecoration(
                         counterText: '',
-                        errorStyle: const TextStyle(
-                            color: Colors.red,
-                            fontSize: 12.0
-                        ),
+                        errorStyle:
+                            const TextStyle(color: Colors.red, fontSize: 12.0),
                         labelText: "Описание",
                         hintText: widget.desc,
                         labelStyle: const TextStyle(
                             fontSize: 14, color: Colors.white38),
                         border: OutlineInputBorder(
-                          gapPadding: MediaQuery
-                              .of(context)
-                              .size
-                              .width*0.55,
+                          gapPadding: MediaQuery.of(context).size.width * 0.55,
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
@@ -119,14 +111,10 @@ class _PartFormWidgetState extends State<PartFormWidget> {
                     ),
                   ),
                   Container(
-                    width: MediaQuery
-                        .of(context)
-                        .size
-                        .width*0.33,
+                    width: MediaQuery.of(context).size.width * 0.33,
                     decoration: BoxDecoration(
                         color: Colors.black38,
-                        borderRadius: BorderRadius.circular(10)
-                    ),
+                        borderRadius: BorderRadius.circular(10)),
                     child: Padding(
                       padding: const EdgeInsets.only(left: 0.0, right: 0.0),
                       child: TextFormField(
@@ -137,7 +125,7 @@ class _PartFormWidgetState extends State<PartFormWidget> {
                         },
                         onChanged: widget.onChangedPrice,
                         validator: (price) {
-                          if (price!.isNotEmpty && !isNumeric(price)){
+                          if (price!.isNotEmpty && !isNumeric(price)) {
                             return 'Введите сумму';
                           }
                           return null;
@@ -148,32 +136,28 @@ class _PartFormWidgetState extends State<PartFormWidget> {
                         decoration: InputDecoration(
                           counterText: '',
                           errorStyle: const TextStyle(
-                            color: Colors.red,
-                            fontSize: 12.0
-                          ),
+                              color: Colors.red, fontSize: 12.0),
                           labelText: "Цена",
                           labelStyle: const TextStyle(
                               fontSize: 14, color: Colors.white38),
                           border: OutlineInputBorder(
-                            gapPadding: MediaQuery
-                                .of(context)
-                                .size
-                                .width*0.33,
+                            gapPadding:
+                                MediaQuery.of(context).size.width * 0.33,
                             borderRadius: BorderRadius.circular(10),
                           ),
                           suffixIcon: const Icon(
-                            Icons.currency_ruble_rounded, color: Colors.green,),
+                            Icons.currency_ruble_rounded,
+                            color: Colors.green,
+                          ),
                         ),
                         maxLines: 1,
                         maxLength: 6,
                       ),
                     ),
                   )
-                ]
-            ),
+                ]),
           ),
         ),
-
       ],
     );
   }

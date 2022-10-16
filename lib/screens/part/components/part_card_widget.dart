@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../models/part_model.dart';
+import 'package:local_db/models/part_model.dart';
+
 
 class PartCardWidget extends StatefulWidget {
   const PartCardWidget({

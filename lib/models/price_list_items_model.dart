@@ -1,8 +1,5 @@
 const String tablePriceListItems = 'price_list_items';
 
-Map<String, PriceListItem> userPriceItemsList = {};
-Map<String, PriceListItem> standartPriceItemsList = {};
-
 class PriceListItemFields {
   static final List<String> values = [
     id,
@@ -10,6 +7,7 @@ class PriceListItemFields {
     title,
     price,
     desc,
+    isGlobal,
   ];
 
   static const String id = '_id';
@@ -17,14 +15,16 @@ class PriceListItemFields {
   static const String title = 'title';
   static const String price = 'price';
   static const String desc = 'desc';
+  static const String isGlobal = 'isGlobal';
 }
 
 class PriceListItem {
   final int? id;
-  final int? lID;
+  late int? lID;
   late String title;
   late int? price;
   late String? desc;
+  final bool isGlobal;
 
   PriceListItem({
     this.id,
@@ -32,6 +32,7 @@ class PriceListItem {
     required this.title,
     required this.price,
     required this.desc,
+    required this.isGlobal,
   });
 
   PriceListItem copy({
@@ -40,6 +41,7 @@ class PriceListItem {
     String? title,
     int? price,
     String? desc,
+    bool? isGlobal,
   }) =>
       PriceListItem(
         id: id ?? this.id,
@@ -47,6 +49,7 @@ class PriceListItem {
         title: title ?? this.title,
         price: price ?? this.price,
         desc: desc ?? this.desc,
+        isGlobal: isGlobal ?? this.isGlobal,
       );
 
   static PriceListItem fromJson(Map<String, Object?> json) => PriceListItem(
@@ -55,6 +58,7 @@ class PriceListItem {
         title: json[PriceListItemFields.title] as String,
         price: json[PriceListItemFields.price] as int,
         desc: json[PriceListItemFields.desc] as String,
+        isGlobal: json[PriceListItemFields.isGlobal] == 1,
       );
 
   Map<String, Object?> toJson() => {
@@ -63,5 +67,6 @@ class PriceListItem {
         PriceListItemFields.title: title,
         PriceListItemFields.price: price,
         PriceListItemFields.desc: desc,
+        PriceListItemFields.isGlobal: isGlobal ? 1 : 0,
       };
 }

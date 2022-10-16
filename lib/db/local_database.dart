@@ -1,9 +1,9 @@
-import 'package:local_db/models/normal_parts_lib.dart';
+import 'package:local_db/models/standart_parts_lib.dart';
 // ignore: depend_on_referenced_packages
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../models/car_model.dart';
+import '../screens/car/components/car_model.dart';
 import '../models/price_list_items_model.dart';
 import '../models/price_list_model.dart';
 import '../models/profile_model.dart';
@@ -76,34 +76,40 @@ CREATE TABLE $tableCarParts(
     await db.execute('''
 CREATE TABLE $tablePriceLists(
   ${PriceListFields.id} $idType,
-  ${PriceListFields.pTitle} $textType,
   ${PriceListFields.carType} $textType,
   ${PriceListFields.title} $textType,
   ${PriceListFields.desc} $textType,
   ${PriceListFields.price} $integerType,
-  ${PriceListFields.time} $textType
+  ${PriceListFields.time} $textType,
+  ${PriceListFields.clientFullName} $textType,
+  ${PriceListFields.clientPhoneNumber} $textType,
+  ${PriceListFields.deadLineTime} $textType,
+  ${PriceListFields.isCompleted} $boolType,
+  ${PriceListFields.isPaid} $boolType
   )
 ''');
 
     await db.execute('''
 CREATE TABLE $tablePriceListItems(
   ${PriceListItemFields.id} $idType,
-  ${PriceListItemFields.lID} $integerType,
+  ${PriceListItemFields.lID} $pIDType,
   ${PriceListItemFields.title} $textType,
   ${PriceListItemFields.desc} $textType,
-  ${PriceListItemFields.price} $integerType
+  ${PriceListItemFields.price} $integerType,
+  ${PriceListItemFields.isGlobal} $boolType
   )
 ''');
   }
 
   ///Profiles methods
-  Future <Profile> createProfile (Profile profile) async {
+  Future<Profile> createProfile(Profile profile) async {
     final db = await instance.database;
     final id = await db.insert(tableProfiles, profile.toJson());
     return profile.copy(id: id);
   }
-  Future <void> createProfileParts (int pID, String type) async {
-    for (NormalPart part in parts) {
+
+  Future<void> createProfileParts(int pID, String type) async {
+    for (StandartPart part in parts) {
       final newPart = Part(
           pID: pID,
           title: part.title,
@@ -116,12 +122,12 @@ CREATE TABLE $tablePriceListItems(
           price4: 0,
           desc4: '',
           carType: type,
-          side: part.side
-      );
+          side: part.side);
       await createPart(newPart);
     }
   }
-  Future<Profile>  readTitleProfile(String title) async {
+
+  Future<Profile> readTitleProfile(String title) async {
     final db = await instance.database;
 
     final maps = await db.query(
@@ -137,7 +143,8 @@ CREATE TABLE $tablePriceListItems(
       throw Exception('Profile $title not found');
     }
   }
-  Future<Profile>  readIDProfile(int id) async {
+
+  Future<Profile> readIDProfile(int id) async {
     final db = await instance.database;
 
     final maps = await db.query(
@@ -153,13 +160,16 @@ CREATE TABLE $tablePriceListItems(
       throw Exception('Profile $id not found');
     }
   }
+
   Future<List<Profile>> readAllProfiles() async {
     final db = await instance.database;
-    const orderBy = '${ProfileFields.title} ASC'; //соритировка по id в прямом порядке (ASC)
+    const orderBy =
+        '${ProfileFields.title} ASC'; //соритировка по id в прямом порядке (ASC)
 
     final result = await db.query(tableProfiles, orderBy: orderBy);
     return result.map((json) => Profile.fromJson(json)).toList();
   }
+
   Future<int> updateProfile(Profile profile) async {
     final db = await instance.database;
 
@@ -170,6 +180,7 @@ CREATE TABLE $tablePriceListItems(
       whereArgs: [profile.id],
     );
   }
+
   Future<int> deleteProfile(int id) async {
     final db = await instance.database;
     deleteProfileParts(id);
@@ -181,12 +192,13 @@ CREATE TABLE $tablePriceListItems(
   }
 
   ///CarTypes methods
-  Future <Car> createCar (Car car) async {
+  Future<Car> createCar(Car car) async {
     final db = await instance.database;
     final id = await db.insert(tableCars, car.toJson());
     return car.copy(id: id);
   }
-  Future <Car> readCar(String title) async {
+
+  Future<Car> readCar(String title) async {
     final db = await instance.database;
 
     final maps = await db.query(
@@ -202,35 +214,35 @@ CREATE TABLE $tablePriceListItems(
       throw Exception('Type $title not found');
     }
   }
-  Future <List<Car>> readGlobalCars() async {
+
+  Future<List<Car>> readGlobalCars() async {
     final db = await instance.database;
 
-    final result = await db.query(
-        tableCars,
+    final result = await db.query(tableCars,
+        columns: CarFields.values, where: "${CarFields.isGlobal} = '1'");
+    return result.map((json) => Car.fromJson(json)).toList();
+  }
+
+  Future<List<Car>> readProfileCars(int pID) async {
+    final db = await instance.database;
+
+    final result = await db.query(tableCars,
         columns: CarFields.values,
-        where: "${CarFields.isGlobal} = '1'"
-    );
+        where: "${CarFields.pID} = ? OR ${CarFields.isGlobal} = '1' ",
+        whereArgs: [pID],
+        orderBy: '${CarFields.id} ASC');
     return result.map((json) => Car.fromJson(json)).toList();
   }
-  Future <List<Car>> readProfileCars(int pID) async {
-    final db = await instance.database;
 
-    final result = await db.query(
-      tableCars,
-      columns: CarFields.values,
-      where: "${CarFields.pID} = ? OR ${CarFields.isGlobal} = '1' ",
-      whereArgs: [pID],
-      orderBy: '${CarFields.id} ASC'
-    );
-    return result.map((json) => Car.fromJson(json)).toList();
-  }
   Future<List<Car>> readAllCars() async {
     final db = await instance.database;
-    const orderBy = '${CarFields.title} ASC'; //соритировка по id в прямом порядке (ASC)
+    const orderBy =
+        '${CarFields.title} ASC'; //соритировка по id в прямом порядке (ASC)
 
     final result = await db.query(tableCars, orderBy: orderBy);
     return result.map((json) => Car.fromJson(json)).toList();
   }
+
   Future<int> updateCar(Car car) async {
     final db = await instance.database;
 
@@ -241,6 +253,7 @@ CREATE TABLE $tablePriceListItems(
       whereArgs: [car.id],
     );
   }
+
   Future<int> deleteCar(int id) async {
     final db = await instance.database;
     return await db.delete(
@@ -250,13 +263,13 @@ CREATE TABLE $tablePriceListItems(
     );
   }
 
-
   ///Parts methods
   Future<Part> createPart(Part part) async {
     final db = await instance.database;
     final id = await db.insert(tableCarParts, part.toJson());
     return part.copy(id: id);
   }
+
   Future<Part> testReadParts(int pID) async {
     final db = await instance.database;
 
@@ -273,6 +286,7 @@ CREATE TABLE $tablePriceListItems(
       throw Exception('parts with $pID not found');
     }
   }
+
   Future<Part> readPart(int id) async {
     final db = await instance.database;
 
@@ -289,13 +303,15 @@ CREATE TABLE $tablePriceListItems(
       throw Exception('ID $id not found');
     }
   }
+
   Future<Part> readPTTPart(String title, int pID, String carType) async {
     final db = await instance.database;
 
     final maps = await db.query(
       tableCarParts,
       columns: PartFields.values,
-      where: '${PartFields.title} = ? AND ${PartFields.pID} = ? AND ${PartFields.carType} = ?',
+      where:
+          '${PartFields.title} = ? AND ${PartFields.pID} = ? AND ${PartFields.carType} = ?',
       whereArgs: [title, pID, carType],
     );
 
@@ -305,19 +321,20 @@ CREATE TABLE $tablePriceListItems(
       throw Exception('Part $title not found');
     }
   }
+
   Future<List<Part>> readTypeParts(String carType) async {
     final db = await instance.database;
 
-    final result = await db.query(
-      tableCarParts,
-      where: '${PartFields.carType} = ?',
-      whereArgs: [carType]
-    );
+    final result = await db.query(tableCarParts,
+        where: '${PartFields.carType} = ?', whereArgs: [carType]);
     return result.map((json) => Part.fromJson(json)).toList();
   }
-  Future<List<Part>> readProfileParts(String carType, int pID, String? side) async {
+
+  Future<List<Part>> readProfileParts(
+      String carType, int pID, String? side) async {
     final db = await instance.database;
-    const orderBy = '${PartFields.title} ASC'; //соритировка по title в прямом порядке (ASC)
+    const orderBy =
+        '${PartFields.title} ASC'; //соритировка по title в прямом порядке (ASC)
 
     final result = await db.query(
       tableCarParts,
@@ -325,19 +342,20 @@ CREATE TABLE $tablePriceListItems(
       where: side != null
           ? '${PartFields.carType} = ? AND ${PartFields.pID} = ? AND ${PartFields.side} = ?'
           : '${PartFields.carType} = ? AND ${PartFields.pID} = ?',
-      whereArgs: side != null
-        ? [carType, pID, side]
-        : [carType, pID],
+      whereArgs: side != null ? [carType, pID, side] : [carType, pID],
     );
     return result.map((json) => Part.fromJson(json)).toList();
   }
+
   Future<List<Part>> readAllParts() async {
     final db = await instance.database;
-    const orderBy = '${PartFields.id} ASC'; //соритировка по id в прямом порядке (ASC)
+    const orderBy =
+        '${PartFields.id} ASC'; //соритировка по id в прямом порядке (ASC)
 
     final result = await db.query(tableCarParts, orderBy: orderBy);
     return result.map((json) => Part.fromJson(json)).toList();
   }
+
   Future<int> updatePart(Part part) async {
     final db = await instance.database;
 
@@ -348,6 +366,7 @@ CREATE TABLE $tablePriceListItems(
       whereArgs: [part.id],
     );
   }
+
   Future<int> deletePart(int id) async {
     final db = await instance.database;
     return await db.delete(
@@ -356,6 +375,7 @@ CREATE TABLE $tablePriceListItems(
       whereArgs: [id],
     );
   }
+
   Future<int> deleteTypeParts(int pID, String type, bool isGlobal) async {
     final db = await instance.database;
     return await db.delete(
@@ -363,11 +383,10 @@ CREATE TABLE $tablePriceListItems(
       where: isGlobal
           ? '${PartFields.carType} = ?'
           : '${PartFields.pID} = ? AND ${PartFields.carType} = ?',
-      whereArgs: isGlobal
-          ? [type]
-          : [pID, type],
+      whereArgs: isGlobal ? [type] : [pID, type],
     );
   }
+
   Future<int> deleteProfileParts(int pID) async {
     final db = await instance.database;
     return await db.delete(
@@ -377,14 +396,14 @@ CREATE TABLE $tablePriceListItems(
     );
   }
 
-
   ///PriceLists methods
-  Future <PriceList> createPriceList (PriceList priceList) async {
+  Future<PriceList> createPriceList(PriceList priceList) async {
     final db = await instance.database;
     final id = await db.insert(tablePriceLists, priceList.toJson());
     return priceList.copy(id: id);
   }
-  Future<PriceList>  readPriceList(int id) async {
+
+  Future<PriceList> readPriceList(int id) async {
     final db = await instance.database;
 
     final maps = await db.query(
@@ -400,23 +419,27 @@ CREATE TABLE $tablePriceListItems(
       throw Exception('Price List $id not found');
     }
   }
+
   Future<List<PriceList>> readAllPriceLists() async {
     final db = await instance.database;
-    const orderBy = '${PriceListFields.title} ASC'; //соритировка по id в прямом порядке (ASC)
+    const orderBy =
+        '${PriceListFields.title} ASC'; //соритировка по id в прямом порядке (ASC)
 
     final result = await db.query(tablePriceLists, orderBy: orderBy);
     return result.map((json) => PriceList.fromJson(json)).toList();
   }
+
   Future<int> updatePriceList(PriceList priceList) async {
     final db = await instance.database;
 
     return db.update(
-      tableProfiles,
+      tablePriceLists,
       priceList.toJson(),
       where: '${PriceListFields.id} = ?',
       whereArgs: [priceList.id],
     );
   }
+
   Future<int> deletePriceList(int id) async {
     final db = await instance.database;
     deletePriceListItems(id);
@@ -427,19 +450,20 @@ CREATE TABLE $tablePriceListItems(
     );
   }
 
-
   ///PriceListItems methods
-  Future <PriceListItem> createPriceListItem (PriceListItem priceListItem) async {
+  Future<PriceListItem> createPriceListItem(PriceListItem priceListItem) async {
     final db = await instance.database;
     final id = await db.insert(tablePriceListItems, priceListItem.toJson());
     return priceListItem.copy(id: id);
   }
-  Future <void> createPriceListItems (int pID, List<PriceListItem> items) async {
+
+  Future<void> createPriceListItems(int pID, List<PriceListItem> items) async {
     for (PriceListItem item in items) {
       await createPriceListItem(item);
     }
   }
-  Future<PriceListItem>  readPriceListItem(int id) async {
+
+  Future<PriceListItem> readPriceListItem(int id) async {
     final db = await instance.database;
 
     final maps = await db.query(
@@ -455,13 +479,36 @@ CREATE TABLE $tablePriceListItems(
       throw Exception('Price List $id not found');
     }
   }
+
   Future<List<PriceListItem>> readAllPriceListItems() async {
     final db = await instance.database;
-    const orderBy = '${PriceListItemFields.title} ASC'; //соритировка по id в прямом порядке (ASC)
+    const orderBy =
+        '${PriceListItemFields.title} ASC'; //соритировка по title в прямом порядке (ASC)
 
     final result = await db.query(tablePriceListItems, orderBy: orderBy);
     return result.map((json) => PriceListItem.fromJson(json)).toList();
   }
+
+  Future<List<PriceListItem>> readGlobalPriceListItems() async {
+    final db = await instance.database;
+    const orderBy =
+        '${PriceListItemFields.title} ASC'; //соритировка по title в прямом порядке (ASC)
+
+    final result = await db.query(tablePriceListItems,
+        orderBy: orderBy, where: "${PriceListItemFields.isGlobal} = '1'");
+    return result.map((json) => PriceListItem.fromJson(json)).toList();
+  }
+
+  Future<List<PriceListItem>> readLIDPriceListItems(int lID) async {
+    final db = await instance.database;
+    const orderBy =
+        '${PriceListItemFields.title} ASC'; //соритировка по title в прямом порядке (ASC)
+
+    final result = await db.query(tablePriceListItems,
+        orderBy: orderBy, where: "${PriceListItemFields.lID} = ?", whereArgs: [lID]);
+    return result.map((json) => PriceListItem.fromJson(json)).toList();
+  }
+
   Future<int> updatePriceListItem(PriceListItem priceListItem) async {
     final db = await instance.database;
 
@@ -472,6 +519,7 @@ CREATE TABLE $tablePriceListItems(
       whereArgs: [priceListItem.id],
     );
   }
+
   Future<int> deletePriceListItems(int lID) async {
     final db = await instance.database;
     return await db.delete(
@@ -480,6 +528,7 @@ CREATE TABLE $tablePriceListItems(
       whereArgs: [lID],
     );
   }
+
   Future<int> deletePriceListItem(int id) async {
     final db = await instance.database;
     return await db.delete(

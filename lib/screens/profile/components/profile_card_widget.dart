@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:local_db/db/local_database.dart';
-import '../models/profile_model.dart';
+import '../../../models/profile_model.dart';
 
 class ProfileCardWidget extends StatefulWidget {
   const ProfileCardWidget({

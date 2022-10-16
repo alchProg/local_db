@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:local_db/models/part_model.dart';
-import 'package:local_db/widget/car_form_widget.dart';
+import 'package:local_db/screens/car/components/car_form_widget.dart';
 
-import '../db/local_database.dart';
-import '../models/car_model.dart';
+import '../../db/local_database.dart';
+import 'components/car_model.dart';
 
 
 
